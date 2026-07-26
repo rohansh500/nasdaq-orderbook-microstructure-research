@@ -1,0 +1,201 @@
+{
+  "configuration": {
+    "result_schema_version": "0.6.0",
+    "ticker": "AAPL",
+    "levels": 10,
+    "horizon_events": 100,
+    "max_rows": null,
+    "rows_loaded": 400391,
+    "folds": 5,
+    "development_fraction": 0.8,
+    "exploratory_holdout_fraction": 0.2,
+    "requested_purge_events": 100,
+    "effective_purge_events": 100,
+    "tick_size": 0.01,
+    "confidence_thresholds": [
+      0.05,
+      0.1,
+      0.2,
+      0.3,
+      0.4,
+      0.5
+    ],
+    "cost_fractions": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "default_regime_threshold": 0.1,
+    "default_regime_cost_fraction": 1.0,
+    "split_design": "purged_expanding_window_first_80_percent"
+  },
+  "folds": [
+    {
+      "fold_metadata": {
+        "fold": 1,
+        "train_start": 0,
+        "train_end": 120016,
+        "validation_start": 120117,
+        "validation_end": 160155,
+        "train_rows": 120017,
+        "validation_rows": 40039,
+        "purge_events": 100,
+        "development_end_exclusive": 320312,
+        "train_rows_after_target_filter": 120017,
+        "validation_rows_after_target_filter": 40039,
+        "train_time_start_seconds": 34200.004241176,
+        "train_time_end_seconds": 40503.071225279,
+        "validation_time_start_seconds": 40504.816458975,
+        "validation_time_end_seconds": 43228.641331124
+      },
+      "regime_metadata": {
+        "tick_size": 0.01,
+        "depth_column": "total_depth_10",
+        "depth_cutpoints": {
+          "low": 2588.0,
+          "high": 3855.0
+        },
+        "volatility_column": "rolling_volatility_50",
+        "volatility_cutpoints": {
+          "low": 1.1107575372595077e-05,
+          "high": 1.9504750913755782e-05
+        }
+      }
+    },
+    {
+      "fold_metadata": {
+        "fold": 2,
+        "train_start": 0,
+        "train_end": 160055,
+        "validation_start": 160156,
+        "validation_end": 200194,
+        "train_rows": 160056,
+        "validation_rows": 40039,
+        "purge_events": 100,
+        "development_end_exclusive": 320312,
+        "train_rows_after_target_filter": 160056,
+        "validation_rows_after_target_filter": 40039,
+        "train_time_start_seconds": 34200.004241176,
+        "train_time_end_seconds": 43223.952170632,
+        "validation_time_start_seconds": 43228.641331124,
+        "validation_time_end_seconds": 45969.413604707
+      },
+      "regime_metadata": {
+        "tick_size": 0.01,
+        "depth_column": "total_depth_10",
+        "depth_cutpoints": {
+          "low": 2693.0,
+          "high": 3800.0
+        },
+        "volatility_column": "rolling_volatility_50",
+        "volatility_cutpoints": {
+          "low": 1.06622669984097e-05,
+          "high": 1.8441557798470304e-05
+        }
+      }
+    },
+    {
+      "fold_metadata": {
+        "fold": 3,
+        "train_start": 0,
+        "train_end": 200094,
+        "validation_start": 200195,
+        "validation_end": 240233,
+        "train_rows": 200095,
+        "validation_rows": 40039,
+        "purge_events": 100,
+        "development_end_exclusive": 320312,
+        "train_rows_after_target_filter": 200095,
+        "validation_rows_after_target_filter": 40039,
+        "train_time_start_seconds": 34200.004241176,
+        "train_time_end_seconds": 45963.701114559,
+        "validation_time_start_seconds": 45969.414797508,
+        "validation_time_end_seconds": 49362.956244818
+      },
+      "regime_metadata": {
+        "tick_size": 0.01,
+        "depth_column": "total_depth_10",
+        "depth_cutpoints": {
+          "low": 2606.0,
+          "high": 3678.0
+        },
+        "volatility_column": "rolling_volatility_50",
+        "volatility_cutpoints": {
+          "low": 9.890854547878491e-06,
+          "high": 1.7307202320079102e-05
+        }
+      }
+    },
+    {
+      "fold_metadata": {
+        "fold": 4,
+        "train_start": 0,
+        "train_end": 240133,
+        "validation_start": 240234,
+        "validation_end": 280272,
+        "train_rows": 240134,
+        "validation_rows": 40039,
+        "purge_events": 100,
+        "development_end_exclusive": 320312,
+        "train_rows_after_target_filter": 240134,
+        "validation_rows_after_target_filter": 40039,
+        "train_time_start_seconds": 34200.004241176,
+        "train_time_end_seconds": 49361.175802788,
+        "validation_time_start_seconds": 49362.956480514,
+        "validation_time_end_seconds": 52160.900748787
+      },
+      "regime_metadata": {
+        "tick_size": 0.01,
+        "depth_column": "total_depth_10",
+        "depth_cutpoints": {
+          "low": 2474.0,
+          "high": 3549.0
+        },
+        "volatility_column": "rolling_volatility_50",
+        "volatility_cutpoints": {
+          "low": 9.402554425724397e-06,
+          "high": 1.6504108270512063e-05
+        }
+      }
+    },
+    {
+      "fold_metadata": {
+        "fold": 5,
+        "train_start": 0,
+        "train_end": 280172,
+        "validation_start": 280273,
+        "validation_end": 320311,
+        "train_rows": 280173,
+        "validation_rows": 40039,
+        "purge_events": 100,
+        "development_end_exclusive": 320312,
+        "train_rows_after_target_filter": 280173,
+        "validation_rows_after_target_filter": 40039,
+        "train_time_start_seconds": 34200.004241176,
+        "train_time_end_seconds": 52156.522052938,
+        "validation_time_start_seconds": 52160.918067995,
+        "validation_time_end_seconds": 55011.764845894
+      },
+      "regime_metadata": {
+        "tick_size": 0.01,
+        "depth_column": "total_depth_10",
+        "depth_cutpoints": {
+          "low": 2413.0,
+          "high": 3466.0
+        },
+        "volatility_column": "rolling_volatility_50",
+        "volatility_cutpoints": {
+          "low": 9.23870016273117e-06,
+          "high": 1.62195843686487e-05
+        }
+      }
+    }
+  ],
+  "row_counts": {
+    "regime_rows": 45,
+    "threshold_cost_rows": 150,
+    "spread_confidence_rows": 84
+  }
+}

@@ -136,6 +136,69 @@ The 50-event horizon remains the primary research horizon because it offers
 the strongest overall balance of ranking performance, point-forecast
 accuracy and residual stability.
 
+## Regime and execution-cost sensitivity
+
+Phase B evaluated the existing models across displayed-depth and volatility
+regimes, confidence thresholds, and transaction-cost assumptions using the
+same five purged walk-forward folds. Regime cutoffs for depth and volatility
+were learned from each fold's training data and then applied to its later
+validation block. The final 20% exploratory holdout remained unused.
+
+At the primary 50-event horizon, low-volatility observations produced the
+strongest average statistical results. Rank IC reached 0.269, Ridge MAE
+improved by 0.50% relative to the zero-return baseline, non-zero directional
+accuracy reached 58.43%, and gross edge averaged 0.297 bps per active signal.
+The estimated break-even cost fraction was 12.30%.
+
+Lower displayed depth was also associated with stronger predictability. The
+low-depth regime produced rank IC of 0.266, Ridge MAE improvement of 1.39%,
+non-zero directional accuracy of 58.71%, and gross edge of 0.261 bps per
+active signal. Performance weakened as displayed depth increased.
+
+| 50-event regime | Rank IC | Ridge MAE improvement | Non-zero directional accuracy | Gross edge per active signal | Break-even cost fraction |
+|---|---:|---:|---:|---:|---:|
+| Low volatility | 0.269 | +0.50% | 58.43% | 0.297 bps | 12.30% |
+| Medium volatility | 0.195 | -0.42% | 56.27% | 0.155 bps | 6.28% |
+| High volatility | 0.104 | -0.99% | 55.13% | 0.132 bps | 5.27% |
+| Low displayed depth | 0.266 | +1.39% | 58.71% | 0.261 bps | 10.04% |
+| Medium displayed depth | 0.193 | -0.85% | 57.02% | 0.209 bps | 8.75% |
+| High displayed depth | 0.108 | -1.74% | 53.05% | 0.098 bps | 4.28% |
+
+Confidence filtering increased average gross edge but sharply reduced signal
+activity. At 50 events, the gross edge rose from 0.213 bps at a 0.10
+confidence threshold to approximately 0.35 bps at thresholds between 0.30
+and 0.50. Over the same range, the active-signal fraction fell from 47.88%
+to 1.85%.
+
+| 50-event confidence threshold | Active-signal fraction | Gross edge per active signal | Full-cost net edge per active signal | Break-even cost fraction | Positive-gross folds |
+|---:|---:|---:|---:|---:|---:|
+| 0.10 | 47.88% | 0.213 bps | -2.354 bps | 8.67% | 5/5 |
+| 0.20 | 19.75% | 0.313 bps | -2.125 bps | 13.39% | 5/5 |
+| 0.30 | 8.78% | 0.346 bps | -1.967 bps | 15.55% | 5/5 |
+| 0.40 | 4.03% | 0.353 bps | -1.785 bps | 17.00% | 5/5 |
+| 0.50 | 1.85% | 0.350 bps | -1.674 bps | 17.43% | 5/5 |
+
+Across the full validation sample, no 50-event confidence threshold produced
+positive average net edge when even 25% of the full quoted-spread cost was
+applied. The strongest threshold therefore still required execution costs
+below approximately 17% of the aggressive crossing-cost estimate.
+
+Exact tick-spread buckets were highly imbalanced. Approximately 99.0% of
+validation observations had spreads of three or more ticks, while one-tick
+and two-tick observations represented only about 0.34% and 0.65%. After
+non-overlapping horizon sampling, the 50-event one-tick and two-tick buckets
+contained averages of only 3.8 and 4.4 observations per fold. Some
+spread-confidence intersections produced isolated positive net folds or
+slightly positive means, but these outcomes are too sparse to support a
+profitability claim and are retained only as exploratory diagnostics.
+
+Overall, the signal is strongest during quieter, lower-depth conditions and
+among higher-confidence forecasts. These filters improve gross signal
+quality, but the robust configurations remain economically insufficient for
+repeated aggressive spread-crossing execution. The 50-event horizon remains
+the primary horizon for subsequent nonlinear-model and feature-ablation
+experiments.
+
 ## Methodological grounding
 
 This is an independent research project that applies methods developed through MSc Financial Engineering training:
