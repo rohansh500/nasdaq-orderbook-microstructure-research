@@ -199,6 +199,50 @@ repeated aggressive spread-crossing execution. The 50-event horizon remains
 the primary horizon for subsequent nonlinear-model and feature-ablation
 experiments.
 
+## Non-linear models and feature-family ablation
+
+Phase C compared the regularised linear baselines with fixed-parameter
+LightGBM models across the same five purged walk-forward folds. No
+hyperparameter search or validation-based early stopping was performed.
+
+| Horizon | Logistic balanced accuracy | LightGBM balanced accuracy | Ridge rank IC | LightGBM rank IC | LightGBM MAE improvement versus zero |
+|---:|---:|---:|---:|---:|---:|
+| 10 events | 36.56% | 43.78% | 0.198 | 0.229 | +0.53% |
+| 50 events | 37.90% | 41.26% | 0.211 | 0.266 | +0.51% |
+| 100 events | 34.97% | 37.01% | 0.164 | 0.211 | -2.52% |
+
+LightGBM improved rank IC over Ridge in every fold at all three horizons.
+Classification balanced accuracy and macro F1 also improved materially,
+particularly at the 10- and 50-event horizons. However, higher statistical
+performance did not translate into stronger execution economics at the
+50- and 100-event horizons. All full-cost net results remained negative.
+
+Feature-family ablation at the primary 50-event horizon showed that event
+and order-flow features were essential:
+
+| Feature set | Balanced accuracy | MAE improvement | Rank IC | Gross edge per active signal |
+|---|---:|---:|---:|---:|
+| All features | 41.26% | +0.51% | 0.266 | 0.182 bps |
+| Without event flow | 35.68% | -6.44% | 0.048 | 0.010 bps |
+| Without time features | 43.89% | +3.51% | 0.275 | 0.271 bps |
+| Without book state | 41.23% | +0.33% | 0.257 | 0.190 bps |
+| Without volatility | 40.88% | -0.21% | 0.254 | 0.170 bps |
+
+Removing event-flow features almost eliminated the ranking and economic
+signal, supporting the central role of rolling trade pressure, order-flow
+imbalance and event activity in short-horizon price formation.
+
+Removing explicit time-of-day features improved every major average metric
+and produced positive MAE improvement in all five folds. Although these
+features received non-trivial LightGBM gain importance, the ablation
+results indicate that they encouraged unstable intraday shortcuts rather
+than robust generalisation.
+
+The development-selected candidate for final evaluation is therefore the
+50-event LightGBM model using all features except explicit time-of-day
+variables. This configuration has not yet been evaluated on the reserved
+final 20% exploratory holdout.
+
 ## Methodological grounding
 
 This is an independent research project that applies methods developed through MSc Financial Engineering training:
