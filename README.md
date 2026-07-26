@@ -40,6 +40,37 @@ The current evidence therefore supports a limited conclusion:
 
 These results should not be interpreted as evidence of a deployable trading strategy. They are based on one stock and one trading day. The final block is an intraday exploratory holdout, not an untouched final test or evidence of out-of-day and cross-asset generalisation.
 
+## Purged walk-forward validation
+
+To test whether the baseline results were concentrated in one favourable
+intraday period, the models were evaluated across five expanding-window
+folds using only the first 80% of the trading day. Each fold used a
+100-event purge between training and validation.
+
+| Horizon | Mean balanced accuracy | Mean rank IC | Rank IC positive folds | Mean non-zero directional accuracy | Ridge MAE improvement positive folds | Mean break-even cost fraction |
+|---:|---:|---:|---:|---:|---:|---:|
+| 10 events | 36.56% | 0.198 | 5/5 | 60.12% | 0/5 | 3.69% |
+| 50 events | 37.90% | 0.211 | 5/5 | 57.06% | 4/5 | 8.70% |
+| 100 events | 34.97% | 0.164 | 5/5 | 54.03% | 2/5 | 10.76% |
+
+Rank IC remained positive in every fold and horizon, indicating that the
+order-book features retained some ability to rank future mid-price
+movements across different parts of the day. The 50-event horizon provided
+the strongest average statistical performance, while the 10-event horizon
+was the most stable and the 100-event horizon produced the largest gross
+edge per active signal.
+
+The first walk-forward fold was materially weaker at the 50- and 100-event
+horizons. This suggests that a model trained mainly on opening-session
+dynamics does not transfer cleanly into the quieter midday regime.
+Performance improved as the expanding training window incorporated a
+broader range of intraday conditions.
+
+All horizons produced positive mean gross edge in every fold, but none
+covered the estimated quoted-spread cost. The results therefore support
+short-horizon statistical predictability, not a directly executable
+aggressive trading strategy.
+
 ## Methodological grounding
 
 This is an independent research project that applies methods developed through MSc Financial Engineering training:
