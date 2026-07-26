@@ -1,0 +1,153 @@
+{
+  "configuration": {
+    "ticker": "AAPL",
+    "levels": 10,
+    "horizon_events": 10,
+    "max_rows": null,
+    "feature_count": 35,
+    "train_rows": 240134,
+    "validation_rows": 79978,
+    "test_rows": 79979,
+    "purge_events": 100
+  },
+  "validation": {
+    "majority_classifier": {
+      "accuracy": 0.39727174973117607,
+      "balanced_accuracy": 0.3333333333333333,
+      "macro_f1": 0.18954640226933092,
+      "confusion_matrix_labels": [
+        -1,
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          0,
+          24590,
+          0
+        ],
+        [
+          0,
+          31773,
+          0
+        ],
+        [
+          0,
+          23615,
+          0
+        ]
+      ]
+    },
+    "logistic_regression": {
+      "accuracy": 0.41376378504088623,
+      "balanced_accuracy": 0.3561561130787994,
+      "macro_f1": 0.2563937227245372,
+      "confusion_matrix_labels": [
+        -1,
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          1061,
+          22950,
+          579
+        ],
+        [
+          533,
+          30449,
+          791
+        ],
+        [
+          436,
+          21597,
+          1582
+        ]
+      ]
+    },
+    "ridge_regression": {
+      "mae_bps": 0.23229381653523187,
+      "rmse_bps": 0.371178023365737,
+      "rank_ic": 0.2160772233646178,
+      "directional_accuracy": 0.37284003100852736
+    },
+    "signal_simulation": {
+      "observations": 7998.0,
+      "active_signal_fraction": 0.31095273818454616,
+      "gross_return_bps": 272.43532285878615,
+      "net_return_bps": -5064.245596451404,
+      "mean_net_return_active_bps": -2.0362869306197844,
+      "max_drawdown_bps": -5064.2455964513965
+    }
+  },
+  "test": {
+    "majority_classifier": {
+      "accuracy": 0.3838382575426049,
+      "balanced_accuracy": 0.3333333333333333,
+      "macro_f1": 0.1849147978821446,
+      "confusion_matrix_labels": [
+        -1,
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          0,
+          25780,
+          0
+        ],
+        [
+          0,
+          30699,
+          0
+        ],
+        [
+          0,
+          23500,
+          0
+        ]
+      ]
+    },
+    "logistic_regression": {
+      "accuracy": 0.38856449818077243,
+      "balanced_accuracy": 0.3389999519805722,
+      "macro_f1": 0.20007773105625984,
+      "confusion_matrix_labels": [
+        -1,
+        0,
+        1
+      ],
+      "confusion_matrix": [
+        [
+          213,
+          25505,
+          62
+        ],
+        [
+          77,
+          30527,
+          95
+        ],
+        [
+          52,
+          23111,
+          337
+        ]
+      ]
+    },
+    "ridge_regression": {
+      "mae_bps": 0.19788707847433248,
+      "rmse_bps": 0.3153893209732751,
+      "rank_ic": 0.2763295503379734,
+      "directional_accuracy": 0.4020680428612511
+    },
+    "signal_simulation": {
+      "observations": 7998.0,
+      "active_signal_fraction": 0.2341835458864716,
+      "gross_return_bps": 213.46170139997733,
+      "net_return_bps": -3190.7816466213108,
+      "mean_net_return_active_bps": -1.7035673500380732,
+      "max_drawdown_bps": -3190.7816466213153
+    }
+  }
+}

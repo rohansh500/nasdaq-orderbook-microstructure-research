@@ -1,0 +1,28 @@
+seed: 42
+
+data:
+  ticker: AAPL
+  date: "2012-06-21"
+  levels: 10
+  price_scale: 10000.0
+  raw_directory: data/raw/lobster/AAPL_10
+
+targets:
+  horizons: [10, 50, 100]
+
+split:
+  train_fraction: 0.60
+  validation_fraction: 0.20
+  purge_events: 100
+
+features:
+  rolling_windows: [20, 50, 100]
+  depth_levels: [1, 5, 10]
+
+models:
+  logistic_C: 0.10
+  ridge_alpha: 10.0
+
+simulation:
+  confidence_threshold: 0.10
+  additional_fee_bps: 0.0

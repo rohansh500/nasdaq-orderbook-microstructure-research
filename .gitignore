@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.ipynb_checkpoints/
+
+# Environments
+.venv/
+venv/
+.env
+
+# Raw and generated data
+data/raw/*
+data/interim/*
+data/processed/*
+!data/raw/.gitkeep
+!data/interim/.gitkeep
+!data/processed/.gitkeep
+
+# Generated artefacts
+models/*
+# Ignore generated report outputs by default
+reports/figures/*
+reports/tables/*
+
+# Keep folders
+!reports/figures/.gitkeep
+!reports/tables/.gitkeep
+
+# Publish selected lightweight research results
+!reports/figures/*.png
+!reports/tables/*_metrics.json
+!reports/tables/*.csv
+
+# Editors and OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
