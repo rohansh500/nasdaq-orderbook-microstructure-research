@@ -71,6 +71,38 @@ covered the estimated quoted-spread cost. The results therefore support
 short-horizon statistical predictability, not a directly executable
 aggressive trading strategy.
 
+### Moving-block bootstrap uncertainty
+
+Moving-block bootstrap inference was applied to each walk-forward fold using
+1,000-event blocks, 1,000 bootstrap draws and 95% percentile confidence
+intervals. The final exploratory holdout remained unused.
+
+| Horizon | Rank IC, 95% CI | Ridge MAE improvement, 95% CI | Non-zero directional accuracy, 95% CI | Gross edge per active signal, 95% CI | Net edge per active signal, 95% CI |
+|---:|---:|---:|---:|---:|---:|
+| 10 events | 0.198 [0.182, 0.210] | -5.93% [-6.66%, -5.33%] | 60.12% [59.31%, 60.90%] | 0.088 [0.077, 0.096] bps | -2.351 [-2.434, -2.265] bps |
+| 50 events | 0.211 [0.183, 0.236] | -0.06% [-0.99%, 0.86%] | 57.07% [55.62%, 58.27%] | 0.215 [0.173, 0.251] bps | -2.352 [-2.447, -2.251] bps |
+| 100 events | 0.164 [0.126, 0.194] | -3.09% [-4.74%, -1.50%] | 54.04% [52.35%, 55.63%] | 0.245 [0.164, 0.314] bps | -2.287 [-2.405, -2.162] bps |
+
+Rank IC and non-zero directional accuracy remained above their respective
+zero and 50% benchmarks at the horizon-mean level. Gross edge was also
+positive at all three horizons. These findings support the presence of
+short-horizon predictive information in the order-book features.
+
+Point-return calibration was weaker. Ridge regression was conclusively
+worse than the zero-return MAE baseline at 10 and 100 events. At 50 events,
+the confidence interval crossed zero, so the evidence was insufficient to
+conclude that Ridge improved average absolute error.
+
+The estimated break-even fractions of quoted-spread cost were 3.72%,
+8.74% and 10.36% at the 10-, 50- and 100-event horizons respectively.
+All net-return confidence intervals remained below zero. The signal is
+therefore statistically informative but insufficient for repeated
+aggressive spread-crossing execution.
+
+These intervals are conditional on the fitted models, the selected
+1,000-event block length and one AAPL trading day. They do not establish
+out-of-day or cross-asset generalisation.
+
 ## Methodological grounding
 
 This is an independent research project that applies methods developed through MSc Financial Engineering training:
