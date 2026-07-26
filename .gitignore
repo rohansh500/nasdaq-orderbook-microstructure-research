@@ -40,3 +40,13 @@ reports/tables/*
 .idea/
 .DS_Store
 Thumbs.db
+
+# Local review bundles
+_review_bundle/
+*-current.zip
+
+# Local environment snapshots
+environment_state.txt
+git_status.txt
+git_log.txt
+git_uncommitted_diff.txt

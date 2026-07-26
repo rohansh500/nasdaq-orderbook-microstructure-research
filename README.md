@@ -2,10 +2,7 @@
 
 Event-level market-microstructure research using public LOBSTER sample data, with a later extension to raw NASDAQ TotalView-ITCH.
 
-**Current status:** reproducible baseline study completed for 10-event and
-50-event horizons. Results show statistically predictive order-book signals,
-but quoted-spread costs overwhelm the estimated gross edge. Additional
-horizons, non-linear models and robustness analysis are in progress.
+**Current status:** Version 0.2 baseline study completed for 10-, 50-, and 100-event horizons. The repository now includes explicit LOBSTER schemas, one-step message/snapshot reconstruction checks, 35 microstructure features, purged chronological splits, majority and class-balanced logistic classifiers, zero-return and Ridge regression baselines, and spread-aware signal simulation. Phase A—purged walk-forward validation and econometric diagnostics—is next.
 
 ## Research question
 
@@ -13,21 +10,47 @@ Does order-flow imbalance contain incremental information about short-horizon mi
 
 ## Current findings
 
-The initial experiment uses the complete public AAPL 10-level LOBSTER sample for June 21, 2012. Models are evaluated using purged chronological train, validation and exploratory holdout blocks with no random row shuffling.
+The initial experiment uses the complete public AAPL 10-level LOBSTER sample for June 21, 2012. Models are evaluated using contiguous purged chronological training, validation, and exploratory-holdout blocks. Rows are never randomly shuffled.
 
-|   Horizon | Majority accuracy | Logistic accuracy | Balanced accuracy | Macro F1 | Ridge rank IC | Ridge directional accuracy | Gross simulation | Net simulation |
-| --------: | ----------------: | ----------------: | ----------------: | -------: | ------------: | -------------------------: | ---------------: | -------------: |
-| 10 events |            38.38% |            38.86% |            33.90% |   20.01% |         0.276 |                     40.21% |         +213 bps |     −3,191 bps |
-| 50 events |            49.53% |            57.86% |            42.90% |   42.43% |         0.288 |                     57.20% |         +296 bps |     −1,527 bps |
+### Classification results on the exploratory holdout
 
-The 50-event horizon produces a substantially stronger classification result than the 10-event horizon. At 10 events, the classifier largely defaults to the unchanged-price class and provides little improvement over the majority baseline.
+| Horizon | Flat target share | Majority accuracy | Balanced-logistic accuracy | Balanced accuracy | Macro F1 |
+|---:|---:|---:|---:|---:|---:|
+| 10 events | 38.38% | 38.38% | 38.86% | 33.90% | 20.01% |
+| 50 events | 8.39% | 49.53% | 51.52% | 44.04% | 43.07% |
+| 100 events | 4.13% | 51.89% | 53.38% | 41.78% | 40.92% |
 
-Both horizons exhibit positive gross simulated returns, indicating that the order-book features contain some short-horizon ranking information. However, the forecast edge is considerably smaller than the cost of aggressively crossing the quoted spread. Consequently, both simulations produce negative returns after estimated transaction costs.
+The 10-event classifier provides little improvement over the majority baseline and remains dominated by the unchanged-price class. The 50-event horizon has the strongest balanced accuracy and macro F1, while the 100-event horizon has the highest raw accuracy. Because class proportions change sharply with the forecast horizon, raw accuracy is not sufficient by itself.
 
-These results support the distinction between statistical price predictability and executable trading alpha. They should not be interpreted as evidence of a deployable trading strategy.
+### Regression and execution results on the exploratory holdout
 
-The experiment currently uses one stock and one trading day. The final holdout is therefore an intraday exploratory holdout rather than evidence of out-of-day or cross-asset generalisation.
+| Horizon | Zero-return MAE (bps) | Ridge MAE (bps) | Ridge rank IC | Non-zero directional accuracy | Gross edge per active signal (bps) | Estimated cost per active signal (bps) | Net edge per active signal (bps) | Break-even quoted-cost fraction |
+|---:|---:|---:|---:|---:|---:|---:|---:|---:|
+| 10 events | 0.189 | 0.198 | 0.276 | 65.25% | 0.114 | 1.818 | -1.704 | 6.27% |
+| 50 events | 0.555 | 0.540 | 0.288 | 62.44% | 0.295 | 1.795 | -1.500 | 16.45% |
+| 100 events | 0.878 | 0.867 | 0.247 | 57.87% | 0.389 | 1.825 | -1.438 | 21.36% |
 
+The Ridge model has positive rank information at all three horizons. The 50-event horizon produces the strongest rank IC and improves MAE over the zero-return baseline. At 10 events, Ridge improves RMSE and ranking but does not improve MAE, showing why multiple metrics and naive baselines are necessary.
+
+Gross edge per active signal rises with the prediction horizon, but estimated spread costs remain much larger than the forecast edge. Even at 100 events, the signal would break even only if realised execution costs were approximately 21% of the quoted aggressive-crossing estimate.
+
+The current evidence therefore supports a limited conclusion:
+
+> Order-book and order-flow features contain short-horizon predictive information, but the baseline signal is not economically executable under aggressive quoted-spread assumptions.
+
+These results should not be interpreted as evidence of a deployable trading strategy. They are based on one stock and one trading day. The final block is an intraday exploratory holdout, not an untouched final test or evidence of out-of-day and cross-asset generalisation.
+
+## Methodological grounding
+
+This is an independent research project that applies methods developed through MSc Financial Engineering training:
+
+- **Financial data engineering:** explicit schemas, fixed-point price conversion, missing-level handling, transformation, feature construction, and reproducible data-quality checks.
+- **Financial econometrics:** return targets, correlation-based signal evaluation, chronological dependence controls, volatility features, and planned residual and bootstrap diagnostics.
+- **Machine learning in finance:** regularised linear models, class imbalance handling, training-only preprocessing, purged validation, and comparison against defensible naive baselines.
+- **Risk management:** gross-versus-net attribution, quoted-spread cost stress, break-even execution analysis, drawdown, and planned VaR and expected-shortfall diagnostics.
+- **Model-risk discipline:** failure analysis and explicit separation between statistical predictability and executable alpha.
+
+Deep-learning sequence models are deliberately deferred until more dates or raw ITCH samples provide enough independent training and validation data.
 
 ## Initial data path
 
@@ -46,14 +69,16 @@ The raw files are downloaded from a public Hugging Face mirror. They are not com
 
 1. Raw-file ingestion with explicit schemas and fixed-point price conversion.
 2. Message/snapshot row-alignment and quality checks.
-3. A limited-depth price-level reconstruction audit.
+3. A one-step limited-depth price-level reconstruction audit.
 4. Event-level order-book and order-flow features.
-5. Future mid-price targets at 10, 50, and 100 event horizons.
-6. Purged chronological train/validation/test blocks.
-7. Majority, logistic-regression, Ridge, and later LightGBM baselines.
-8. Statistical and cost-aware economic evaluation.
-9. Failure analysis by spread, depth, event intensity, and time of day.
-10. A short research note and reproducible chart pack.
+5. Future mid-price classification and regression targets at 10, 50, and 100 event horizons.
+6. Purged chronological training, validation, and exploratory-holdout blocks.
+7. Majority and class-balanced logistic classification baselines.
+8. Zero-return and Ridge regression baselines.
+9. Statistical and spread-aware economic evaluation.
+10. Reproducible JSON metrics, model artefacts, tests, and research documentation.
+
+Planned additions include walk-forward validation, dependence-aware inference, spread/liquidity/time-of-day regime analysis, cost stress testing, LightGBM comparison, feature-family ablation, a chart pack, and a short research note.
 
 ## Important terminology
 
@@ -118,33 +143,59 @@ The audit writes:
 reports/tables/data_audit.json
 ```
 
-## Run the first baseline experiment
+## Reproduce all baseline experiments
 
-Start with 150,000 rows to verify runtime and outputs:
+Run all three event horizons with the same model and evaluation configuration:
+
+```powershell
+.\scripts\run_all_baselines.ps1
+```
+
+The script generates:
+
+```text
+reports/tables/baseline_h10_metrics.json
+reports/tables/baseline_h50_metrics.json
+reports/tables/baseline_h100_metrics.json
+```
+
+A single horizon can also be run directly:
 
 ```powershell
 python -m orderbook_research.train_baseline `
+    --ticker AAPL `
     --levels 10 `
-    --horizon 50 `
-    --max-rows 150000
+    --horizon 50
 ```
-
-Then run the full day by omitting `--max-rows`.
 
 ## Leakage controls
 
 - Rows are never randomly shuffled before splitting.
 - Splits are contiguous in event time.
-- A purge gap equal to the maximum target horizon separates blocks.
-- All imputers and scalers are fit on training rows only.
-- Future mid-price values are used only in target construction.
-- The final test block is not used for model or threshold selection.
+- A purge gap of at least the maximum target horizon separates adjacent blocks.
+- Imputers and scalers are fitted using training observations only.
+- Future mid-price values are used only for target construction and evaluation.
 - Rolling features use current and past observable events only.
+- The final block is described as an exploratory holdout because it has been inspected during model development.
+- Stronger claims are deferred until purged walk-forward and multi-day evaluation are available.
+
+## Phase A: next research milestone
+
+The next phase will add:
+
+1. Purged expanding-window validation folds.
+2. Fold-level classification and regression metrics.
+3. Mean, dispersion, and worst-fold performance.
+4. Moving-block bootstrap confidence intervals.
+5. Return and residual autocorrelation diagnostics.
+6. A consolidated horizon-comparison table generated from code.
+
+This phase is intended to test whether the current findings persist across different intraday periods rather than depending on one favourable split.
 
 ## One-day limitation
 
-The public sample provides one date. Therefore, a chronological intraday split tests later-time performance but does not establish day-to-day stability. The final report must state this prominently. Stronger validation requires additional dates from licensed LOBSTER data or reconstructed ITCH samples.
+The public sample provides one date. Chronological intraday evaluation controls leakage but does not establish day-to-day stability. Stronger validation requires additional dates from licensed LOBSTER data or reconstructed official ITCH samples.
 
 ## Data and licensing
 
-This repository contains code only. Review the source dataset's terms before redistributing data. Do not commit the raw CSV files.
+This repository contains code and lightweight derived metrics only. Review the source dataset's terms before redistributing data. Do not commit the raw CSV files.

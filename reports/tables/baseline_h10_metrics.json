@@ -1,14 +1,123 @@
 {
   "configuration": {
+    "result_schema_version": "0.2.0",
     "ticker": "AAPL",
     "levels": 10,
     "horizon_events": 10,
     "max_rows": null,
     "feature_count": 35,
+    "feature_columns": [
+      "spread_bps",
+      "queue_imbalance_l1",
+      "microprice_deviation_bps",
+      "depth_imbalance_1",
+      "depth_imbalance_5",
+      "depth_imbalance_10",
+      "ofi_l1",
+      "event_interarrival_us",
+      "is_submission",
+      "is_partial_cancel",
+      "is_deletion",
+      "is_visible_execution",
+      "is_hidden_execution",
+      "seconds_from_open",
+      "session_fraction",
+      "time_sin",
+      "time_cos",
+      "event_intensity_20",
+      "ofi_l1_sum_20",
+      "add_pressure_20",
+      "cancel_pressure_20",
+      "trade_pressure_20",
+      "rolling_volatility_20",
+      "event_intensity_50",
+      "ofi_l1_sum_50",
+      "add_pressure_50",
+      "cancel_pressure_50",
+      "trade_pressure_50",
+      "rolling_volatility_50",
+      "event_intensity_100",
+      "ofi_l1_sum_100",
+      "add_pressure_100",
+      "cancel_pressure_100",
+      "trade_pressure_100",
+      "rolling_volatility_100"
+    ],
+    "class_target": "future_move_10",
+    "return_target": "future_return_bps_10",
     "train_rows": 240134,
     "validation_rows": 79978,
-    "test_rows": 79979,
-    "purge_events": 100
+    "exploratory_holdout_rows": 79979,
+    "purge_events": 100,
+    "split_design": "purged_chronological_train_validation_exploratory_holdout",
+    "logistic_parameters": {
+      "C": 0.1,
+      "max_iter": 500,
+      "solver": "lbfgs",
+      "class_weight": "balanced",
+      "random_state": 42
+    },
+    "ridge_parameters": {
+      "alpha": 10.0
+    },
+    "simulation_parameters": {
+      "confidence_threshold": 0.1,
+      "additional_fee_bps": 0.0,
+      "sampling": "non_overlapping_every_horizon_events"
+    }
+  },
+  "class_distributions": {
+    "train": {
+      "labels": [
+        -1,
+        0,
+        1
+      ],
+      "counts": {
+        "down": 79248,
+        "flat": 82196,
+        "up": 78690
+      },
+      "proportions": {
+        "down": 0.3300157412111571,
+        "flat": 0.3422922201770678,
+        "up": 0.3276920386117751
+      }
+    },
+    "validation": {
+      "labels": [
+        -1,
+        0,
+        1
+      ],
+      "counts": {
+        "down": 24590,
+        "flat": 31773,
+        "up": 23615
+      },
+      "proportions": {
+        "down": 0.30745955137662856,
+        "flat": 0.39727174973117607,
+        "up": 0.29526869889219537
+      }
+    },
+    "exploratory_holdout": {
+      "labels": [
+        -1,
+        0,
+        1
+      ],
+      "counts": {
+        "down": 25780,
+        "flat": 30699,
+        "up": 23500
+      },
+      "proportions": {
+        "down": 0.3223346128358694,
+        "flat": 0.3838382575426049,
+        "up": 0.29382712962152563
+      }
+    }
   },
   "validation": {
     "majority_classifier": {
@@ -36,9 +145,32 @@
           23615,
           0
         ]
-      ]
+      ],
+      "per_class": {
+        "down": {
+          "label": -1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 24590
+        },
+        "flat": {
+          "label": 0,
+          "precision": 0.39727174973117607,
+          "recall": 1.0,
+          "f1": 0.5686392068079927,
+          "support": 31773
+        },
+        "up": {
+          "label": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 23615
+        }
+      }
     },
-    "logistic_regression": {
+    "balanced_logistic_regression": {
       "accuracy": 0.41376378504088623,
       "balanced_accuracy": 0.3561561130787994,
       "macro_f1": 0.2563937227245372,
@@ -63,24 +195,68 @@
           21597,
           1582
         ]
-      ]
+      ],
+      "per_class": {
+        "down": {
+          "label": -1,
+          "precision": 0.5226600985221674,
+          "recall": 0.04314762098413989,
+          "f1": 0.0797145003756574,
+          "support": 24590
+        },
+        "flat": {
+          "label": 0,
+          "precision": 0.406008320443757,
+          "recall": 0.9583293991754005,
+          "f1": 0.570371549794416,
+          "support": 31773
+        },
+        "up": {
+          "label": 1,
+          "precision": 0.5359078590785907,
+          "recall": 0.06699131907685793,
+          "f1": 0.11909511800353823,
+          "support": 23615
+        }
+      }
+    },
+    "zero_return_baseline": {
+      "observations": 79978,
+      "nonzero_observations": 48205,
+      "mae_bps": 0.22086083276724697,
+      "rmse_bps": 0.3765516000930132,
+      "rank_ic": 0.0,
+      "directional_accuracy": 0.39727174973117607,
+      "nonzero_directional_accuracy": 0.0,
+      "mean_actual_return_bps": -0.0032744898403547123,
+      "mean_predicted_return_bps": 0.0
     },
     "ridge_regression": {
+      "observations": 79978,
+      "nonzero_observations": 48205,
       "mae_bps": 0.23229381653523187,
       "rmse_bps": 0.371178023365737,
       "rank_ic": 0.2160772233646178,
-      "directional_accuracy": 0.37284003100852736
+      "directional_accuracy": 0.37284003100852736,
+      "nonzero_directional_accuracy": 0.6185872834768178,
+      "mean_actual_return_bps": -0.0032744898403547123,
+      "mean_predicted_return_bps": -0.009409035287637382
     },
     "signal_simulation": {
-      "observations": 7998.0,
+      "observations": 7998,
       "active_signal_fraction": 0.31095273818454616,
       "gross_return_bps": 272.43532285878615,
       "net_return_bps": -5064.245596451404,
       "mean_net_return_active_bps": -2.0362869306197844,
-      "max_drawdown_bps": -5064.2455964513965
+      "max_drawdown_bps": -5064.2455964513965,
+      "active_signals": 2487,
+      "estimated_total_cost_bps": 5336.68091931019,
+      "mean_gross_return_active_bps": 0.10954375667824129,
+      "mean_estimated_cost_active_bps": 2.1458306872980253,
+      "break_even_cost_fraction": 0.05104958062473045
     }
   },
-  "test": {
+  "exploratory_holdout": {
     "majority_classifier": {
       "accuracy": 0.3838382575426049,
       "balanced_accuracy": 0.3333333333333333,
@@ -106,9 +282,32 @@
           23500,
           0
         ]
-      ]
+      ],
+      "per_class": {
+        "down": {
+          "label": -1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 25780
+        },
+        "flat": {
+          "label": 0,
+          "precision": 0.3838382575426049,
+          "recall": 1.0,
+          "f1": 0.5547443936464338,
+          "support": 30699
+        },
+        "up": {
+          "label": 1,
+          "precision": 0.0,
+          "recall": 0.0,
+          "f1": 0.0,
+          "support": 23500
+        }
+      }
     },
-    "logistic_regression": {
+    "balanced_logistic_regression": {
       "accuracy": 0.38856449818077243,
       "balanced_accuracy": 0.3389999519805722,
       "macro_f1": 0.20007773105625984,
@@ -133,21 +332,65 @@
           23111,
           337
         ]
-      ]
+      ],
+      "per_class": {
+        "down": {
+          "label": -1,
+          "precision": 0.6228070175438597,
+          "recall": 0.0082622187742436,
+          "f1": 0.01630809279534492,
+          "support": 25780
+        },
+        "flat": {
+          "label": 0,
+          "precision": 0.3857195203618766,
+          "recall": 0.9943972116355582,
+          "f1": 0.5558347444511207,
+          "support": 30699
+        },
+        "up": {
+          "label": 1,
+          "precision": 0.6821862348178138,
+          "recall": 0.014340425531914894,
+          "f1": 0.02809035592231391,
+          "support": 23500
+        }
+      }
+    },
+    "zero_return_baseline": {
+      "observations": 79979,
+      "nonzero_observations": 49280,
+      "mae_bps": 0.18882753543328895,
+      "rmse_bps": 0.321864001801587,
+      "rank_ic": 0.0,
+      "directional_accuracy": 0.3838382575426049,
+      "nonzero_directional_accuracy": 0.0,
+      "mean_actual_return_bps": -0.006789495127445229,
+      "mean_predicted_return_bps": 0.0
     },
     "ridge_regression": {
+      "observations": 79979,
+      "nonzero_observations": 49280,
       "mae_bps": 0.19788707847433248,
       "rmse_bps": 0.3153893209732751,
       "rank_ic": 0.2763295503379734,
-      "directional_accuracy": 0.4020680428612511
+      "directional_accuracy": 0.4020680428612511,
+      "nonzero_directional_accuracy": 0.652536525974026,
+      "mean_actual_return_bps": -0.006789495127445229,
+      "mean_predicted_return_bps": -0.01521174831873114
     },
     "signal_simulation": {
-      "observations": 7998.0,
+      "observations": 7998,
       "active_signal_fraction": 0.2341835458864716,
       "gross_return_bps": 213.46170139997733,
       "net_return_bps": -3190.7816466213108,
       "mean_net_return_active_bps": -1.7035673500380732,
-      "max_drawdown_bps": -3190.7816466213153
+      "max_drawdown_bps": -3190.7816466213153,
+      "active_signals": 1873,
+      "estimated_total_cost_bps": 3404.2433480212885,
+      "mean_gross_return_active_bps": 0.11396780640682186,
+      "mean_estimated_cost_active_bps": 1.817535156444895,
+      "break_even_cost_fraction": 0.06270459528812816
     }
   }
 }
