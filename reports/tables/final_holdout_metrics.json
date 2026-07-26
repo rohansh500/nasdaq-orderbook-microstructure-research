@@ -1,0 +1,415 @@
+{
+  "configuration": {
+    "result_schema_version": "0.8.0",
+    "run_type": "frozen_candidate_holdout",
+    "ticker": "AAPL",
+    "levels": 10,
+    "horizon_events": 50,
+    "max_rows": null,
+    "rows_loaded": 400391,
+    "development_fraction": 0.8,
+    "exploratory_holdout_fraction": 0.19999999999999996,
+    "requested_purge_events": 100,
+    "effective_purge_events": 100,
+    "confidence_threshold": 0.1,
+    "feature_set": "without_time",
+    "feature_count": 31,
+    "feature_columns": [
+      "spread_bps",
+      "queue_imbalance_l1",
+      "microprice_deviation_bps",
+      "depth_imbalance_1",
+      "depth_imbalance_5",
+      "depth_imbalance_10",
+      "ofi_l1",
+      "event_interarrival_us",
+      "is_submission",
+      "is_partial_cancel",
+      "is_deletion",
+      "is_visible_execution",
+      "is_hidden_execution",
+      "event_intensity_20",
+      "ofi_l1_sum_20",
+      "add_pressure_20",
+      "cancel_pressure_20",
+      "trade_pressure_20",
+      "rolling_volatility_20",
+      "event_intensity_50",
+      "ofi_l1_sum_50",
+      "add_pressure_50",
+      "cancel_pressure_50",
+      "trade_pressure_50",
+      "rolling_volatility_50",
+      "event_intensity_100",
+      "ofi_l1_sum_100",
+      "add_pressure_100",
+      "cancel_pressure_100",
+      "trade_pressure_100",
+      "rolling_volatility_100"
+    ],
+    "candidate_frozen_before_holdout_run": true,
+    "holdout_status": "not_used_for_phase_a_to_c_lightgbm_candidate_selection; previously_inspected_with_exploratory_linear_baselines",
+    "no_holdout_threshold_or_feature_tuning": true,
+    "cost_assumption": "full_estimated_quoted_spread_crossing_cost",
+    "split_design": "first_80_percent_development_final_20_percent_holdout"
+  },
+  "split": {
+    "development_fraction": 0.8,
+    "boundary_index": 320312,
+    "purge_events": 100,
+    "development_start": 0,
+    "development_end": 320211,
+    "holdout_start": 320312,
+    "holdout_end": 400390,
+    "development_rows_before_target_filter": 320212,
+    "holdout_rows_before_target_filter": 80079,
+    "development_rows_after_target_filter": 320212,
+    "holdout_rows_after_target_filter": 80029,
+    "development_time_start_seconds": 34200.004241176,
+    "development_time_end_seconds": 55010.665418842,
+    "holdout_time_start_seconds": 55011.765003085,
+    "holdout_time_end_seconds": 57598.706772153
+  },
+  "model_parameters": {
+    "balanced_logistic": {
+      "C": 0.1,
+      "class_weight": "balanced",
+      "dual": false,
+      "fit_intercept": true,
+      "intercept_scaling": 1,
+      "l1_ratio": 0.0,
+      "max_iter": 500,
+      "n_jobs": null,
+      "penalty": "deprecated",
+      "random_state": 42,
+      "solver": "lbfgs",
+      "tol": 0.0001,
+      "verbose": 0,
+      "warm_start": false
+    },
+    "ridge": {
+      "alpha": 10.0,
+      "copy_X": true,
+      "fit_intercept": true,
+      "max_iter": null,
+      "positive": false,
+      "random_state": null,
+      "solver": "auto",
+      "tol": 0.0001
+    },
+    "lightgbm_classifier": {
+      "boosting_type": "gbdt",
+      "class_weight": "balanced",
+      "colsample_bytree": 0.8,
+      "importance_type": "gain",
+      "learning_rate": 0.03,
+      "max_depth": -1,
+      "min_child_samples": 500,
+      "min_child_weight": 0.001,
+      "min_split_gain": 0.0,
+      "n_estimators": 250,
+      "n_jobs": -1,
+      "num_leaves": 15,
+      "objective": "multiclass",
+      "random_state": 42,
+      "reg_alpha": 1.0,
+      "reg_lambda": 5.0,
+      "subsample": 0.8,
+      "subsample_for_bin": 200000,
+      "subsample_freq": 1,
+      "verbosity": -1,
+      "deterministic": true,
+      "force_col_wise": true
+    },
+    "lightgbm_regressor": {
+      "boosting_type": "gbdt",
+      "class_weight": null,
+      "colsample_bytree": 0.8,
+      "importance_type": "gain",
+      "learning_rate": 0.03,
+      "max_depth": -1,
+      "min_child_samples": 500,
+      "min_child_weight": 0.001,
+      "min_split_gain": 0.0,
+      "n_estimators": 250,
+      "n_jobs": -1,
+      "num_leaves": 15,
+      "objective": "regression_l1",
+      "random_state": 42,
+      "reg_alpha": 1.0,
+      "reg_lambda": 5.0,
+      "subsample": 0.8,
+      "subsample_for_bin": 200000,
+      "subsample_freq": 1,
+      "verbosity": -1,
+      "deterministic": true,
+      "force_col_wise": true
+    }
+  },
+  "class_distributions": {
+    "development": {
+      "labels": [
+        -1,
+        0,
+        1
+      ],
+      "counts": {
+        "down": 153479,
+        "flat": 21837,
+        "up": 144896
+      },
+      "proportions": {
+        "down": 0.47930433587748117,
+        "flat": 0.06819544551734476,
+        "up": 0.4525002186051741
+      }
+    },
+    "holdout": {
+      "labels": [
+        -1,
+        0,
+        1
+      ],
+      "counts": {
+        "down": 39644,
+        "flat": 6713,
+        "up": 33672
+      },
+      "proportions": {
+        "down": 0.49537042821977034,
+        "flat": 0.08388209274138125,
+        "up": 0.4207474790388484
+      }
+    }
+  },
+  "holdout": {
+    "classification": {
+      "majority_classifier": {
+        "accuracy": 0.49537042821977034,
+        "balanced_accuracy": 0.3333333333333333,
+        "macro_f1": 0.22084625047699424,
+        "confusion_matrix_labels": [
+          -1,
+          0,
+          1
+        ],
+        "confusion_matrix": [
+          [
+            39644,
+            0,
+            0
+          ],
+          [
+            6713,
+            0,
+            0
+          ],
+          [
+            33672,
+            0,
+            0
+          ]
+        ],
+        "per_class": {
+          "down": {
+            "label": -1,
+            "precision": 0.49537042821977034,
+            "recall": 1.0,
+            "f1": 0.6625387514309827,
+            "support": 39644
+          },
+          "flat": {
+            "label": 0,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 6713
+          },
+          "up": {
+            "label": 1,
+            "precision": 0.0,
+            "recall": 0.0,
+            "f1": 0.0,
+            "support": 33672
+          }
+        }
+      },
+      "balanced_logistic": {
+        "accuracy": 0.43855352434742406,
+        "balanced_accuracy": 0.4320068534007511,
+        "macro_f1": 0.391739019576493,
+        "confusion_matrix_labels": [
+          -1,
+          0,
+          1
+        ],
+        "confusion_matrix": [
+          [
+            19883,
+            12292,
+            7469
+          ],
+          [
+            2128,
+            2873,
+            1712
+          ],
+          [
+            9984,
+            11347,
+            12341
+          ]
+        ],
+        "per_class": {
+          "down": {
+            "label": -1,
+            "precision": 0.6214408501328332,
+            "recall": 0.5015386943799819,
+            "f1": 0.5550887086642751,
+            "support": 39644
+          },
+          "flat": {
+            "label": 0,
+            "precision": 0.10836602293301147,
+            "recall": 0.42797556978995976,
+            "f1": 0.1729420617005267,
+            "support": 6713
+          },
+          "up": {
+            "label": 1,
+            "precision": 0.5734132515565468,
+            "recall": 0.3665062960323117,
+            "f1": 0.44718628836467733,
+            "support": 33672
+          }
+        }
+      },
+      "lightgbm_classifier": {
+        "accuracy": 0.5522248185032925,
+        "balanced_accuracy": 0.46188229452683177,
+        "macro_f1": 0.4559932733592822,
+        "confusion_matrix_labels": [
+          -1,
+          0,
+          1
+        ],
+        "confusion_matrix": [
+          [
+            25128,
+            4190,
+            10326
+          ],
+          [
+            2776,
+            1556,
+            2381
+          ],
+          [
+            12239,
+            3923,
+            17510
+          ]
+        ],
+        "per_class": {
+          "down": {
+            "label": -1,
+            "precision": 0.6259621851879531,
+            "recall": 0.6338411865603875,
+            "f1": 0.6298770476393397,
+            "support": 39644
+          },
+          "flat": {
+            "label": 0,
+            "precision": 0.16092667287206536,
+            "recall": 0.23178906599136004,
+            "f1": 0.1899645952875107,
+            "support": 6713
+          },
+          "up": {
+            "label": 1,
+            "precision": 0.5794751298937684,
+            "recall": 0.520016631028748,
+            "f1": 0.5481381771509962,
+            "support": 33672
+          }
+        }
+      }
+    },
+    "regression": {
+      "zero_return": {
+        "observations": 80029,
+        "nonzero_observations": 73316,
+        "mae_bps": 0.5545408995010129,
+        "rmse_bps": 0.7311397382756453,
+        "rank_ic": 0.0,
+        "directional_accuracy": 0.08388209274138125,
+        "nonzero_directional_accuracy": 0.0,
+        "mean_actual_return_bps": -0.03391348845415314,
+        "mean_predicted_return_bps": 0.0
+      },
+      "ridge": {
+        "observations": 80029,
+        "nonzero_observations": 73316,
+        "mae_bps": 0.5414824344777495,
+        "rmse_bps": 0.7171108234290211,
+        "rank_ic": 0.287596462210333,
+        "directional_accuracy": 0.577453173224706,
+        "nonzero_directional_accuracy": 0.6303262589339298,
+        "mean_actual_return_bps": -0.03391348845415314,
+        "mean_predicted_return_bps": -0.08482845684907661
+      },
+      "lightgbm_regressor": {
+        "observations": 80029,
+        "nonzero_observations": 73316,
+        "mae_bps": 0.5175787710308868,
+        "rmse_bps": 0.6838050175357654,
+        "rank_ic": 0.3625448483761853,
+        "directional_accuracy": 0.5981581676642217,
+        "nonzero_directional_accuracy": 0.6529270554858421,
+        "mean_actual_return_bps": -0.03391348845415314,
+        "mean_predicted_return_bps": -0.05641959654403252
+      }
+    },
+    "economics_at_threshold_0_10": {
+      "balanced_logistic": {
+        "observations": 1601,
+        "active_signal_fraction": 0.5421611492816989,
+        "gross_return_bps": 262.96142759672955,
+        "net_return_bps": -1276.6358411241818,
+        "mean_net_return_active_bps": -1.472475018597672,
+        "max_drawdown_bps": -1276.6358411241813,
+        "active_signals": 868,
+        "estimated_total_cost_bps": 1539.7703884245304,
+        "mean_gross_return_active_bps": 0.3029509534524535,
+        "mean_estimated_cost_active_bps": 1.7759750731540147,
+        "break_even_cost_fraction": 0.17077963673907748
+      },
+      "lightgbm_classifier": {
+        "observations": 1601,
+        "active_signal_fraction": 0.6983135540287321,
+        "gross_return_bps": 323.54114672740855,
+        "net_return_bps": -1747.172966266929,
+        "mean_net_return_active_bps": -1.564165592002622,
+        "max_drawdown_bps": -1747.1729662669284,
+        "active_signals": 1118,
+        "estimated_total_cost_bps": 2070.8872326979567,
+        "mean_gross_return_active_bps": 0.2893927967150345,
+        "mean_estimated_cost_active_bps": 1.8539724554144643,
+        "break_even_cost_fraction": 0.1562331070561956
+      }
+    }
+  },
+  "generated_figures": [
+    "final_class_distribution.png",
+    "final_balanced_accuracy.png",
+    "final_macro_f1.png",
+    "final_regression_mae.png",
+    "final_rank_ic.png",
+    "final_nonzero_directional_accuracy.png",
+    "final_signal_economics.png",
+    "final_cumulative_gross.png",
+    "final_cumulative_net.png",
+    "final_drawdown.png",
+    "final_classifier_feature_importance.png"
+  ]
+}

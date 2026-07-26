@@ -243,6 +243,66 @@ The development-selected candidate for final evaluation is therefore the
 variables. This configuration has not yet been evaluated on the reserved
 final 20% exploratory holdout.
 
+## Frozen-candidate holdout evaluation
+
+After completing model comparison and feature-family ablation, the final
+candidate was frozen before configuration-level holdout evaluation:
+
+- Instrument: AAPL
+- Horizon: 50 events
+- Model: fixed-parameter LightGBM classifier and regressor
+- Features: 31 features, excluding explicit clock-time variables
+- Development fraction: first 80%
+- Holdout fraction: final 20%
+- Development-to-holdout purge: 100 events
+- Classification confidence threshold: 0.10
+- Execution cost: full estimated quoted-spread crossing cost
+
+The final block had not been used to select the LightGBM no-time candidate,
+although it had previously been inspected using exploratory linear
+baselines. It is therefore a configuration-level holdout rather than a
+completely untouched independent test.
+
+### Final predictive performance
+
+| Model | Balanced accuracy | Macro F1 | MAE | MAE improvement vs zero | Rank IC | Non-zero directional accuracy |
+|---|---:|---:|---:|---:|---:|---:|
+| Balanced logistic / Ridge | 43.20% | 0.392 | 0.541 bps | +2.35% | 0.288 | 63.03% |
+| LightGBM | 46.19% | 0.456 | 0.518 bps | +6.67% | 0.363 | 65.29% |
+
+The frozen LightGBM candidate improved classification, point-return error,
+ranking correlation and directional accuracy relative to the regularised
+linear models. Its strongest gain was in return ranking, where holdout rank
+IC reached 0.363.
+
+The final block covered approximately 15:16 to 16:00. The result should
+therefore be interpreted as closing-period evidence within one trading day,
+not as proof of out-of-day or cross-asset generalisation.
+
+### Final execution result
+
+| Model | Active fraction | Gross edge per active signal | Estimated cost per active signal | Net edge per active signal | Break-even cost fraction |
+|---|---:|---:|---:|---:|---:|
+| Balanced logistic | 54.22% | 0.303 bps | 1.776 bps | -1.472 bps | 17.08% |
+| LightGBM | 69.83% | 0.289 bps | 1.854 bps | -1.564 bps | 15.62% |
+
+Although LightGBM provided stronger statistical forecasts, it did not
+improve per-signal economics at the frozen threshold. Its probabilities
+generated more active signals, while the balanced logistic classifier
+retained a slightly higher gross edge and break-even cost fraction per
+signal.
+
+Both classifiers remained materially negative after full quoted-spread
+costs. The frozen LightGBM candidate generated approximately 0.289 bps of
+gross edge per active signal against an estimated cost of 1.854 bps.
+The result therefore supports short-horizon price predictability, not an
+immediately executable aggressive trading strategy.
+
+The most influential LightGBM features were spread, rolling trade pressure,
+order-flow imbalance, event intensity, queue imbalance and short-horizon
+volatility. These findings are consistent with the Phase C ablation result
+that event-flow features are central to the signal.
+
 ## Methodological grounding
 
 This is an independent research project that applies methods developed through MSc Financial Engineering training:
