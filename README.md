@@ -103,6 +103,39 @@ These intervals are conditional on the fitted models, the selected
 1,000-event block length and one AAPL trading day. They do not establish
 out-of-day or cross-asset generalisation.
 
+### Econometric and residual diagnostics
+
+Econometric diagnostics were applied across the same five purged
+walk-forward folds. Residual autocorrelation was calculated using
+non-overlapping horizon-spaced observations.
+
+| Horizon | Mean return rank IC | Non-zero directional accuracy | Mean calibration slope | Residual lag-1 ACF | Ljung-Box rejections at lag 20 | Time buckets with positive rank IC |
+|---:|---:|---:|---:|---:|---:|---:|
+| 10 events | 0.198 | 60.12% | 0.745 | -0.097 | 5/5 | 9/9 |
+| 50 events | 0.211 | 57.06% | 0.727 | -0.032 | 2/5 | 9/9 |
+| 100 events | 0.164 | 54.03% | 0.683 | -0.019 | 2/5 | 9/9 |
+
+One-event mid-price returns displayed negative lag-one autocorrelation of
+approximately -0.112, consistent with short-lived microstructure reversal.
+Squared returns displayed positive lag-one autocorrelation of approximately
+0.156, indicating short-horizon volatility clustering.
+
+Calibration slopes were below one at every horizon, showing that the Ridge
+forecasts were more useful for ranking outcomes than for estimating return
+magnitudes. The 10-event residuals also failed the Ljung-Box independence
+test in all five folds, suggesting that the linear feature representation
+left systematic very-short-horizon temporal structure unexplained.
+
+Performance varied materially through the day. The 11:00-12:00 period was
+particularly weak for longer horizons, while the 50-event model produced
+its strongest MAE and directional results after 14:30. This supports the
+presence of intraday regime dependence and motivates explicit spread,
+liquidity and volatility-regime analysis.
+
+The 50-event horizon remains the primary research horizon because it offers
+the strongest overall balance of ranking performance, point-forecast
+accuracy and residual stability.
+
 ## Methodological grounding
 
 This is an independent research project that applies methods developed through MSc Financial Engineering training:
