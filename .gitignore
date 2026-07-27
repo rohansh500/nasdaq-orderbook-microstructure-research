@@ -1,52 +1,36 @@
-# Python
+# Python and environments
+.venv/
 __pycache__/
 *.py[cod]
-*.egg-info/
 .pytest_cache/
 .ruff_cache/
-.mypy_cache/
 .ipynb_checkpoints/
+*.egg-info/
 
-# Environments
-.venv/
-venv/
-.env
+# Private or large market data
+data/
+models/
+*.joblib
+*.pkl
+*.parquet
 
-# Raw and generated data
-data/raw/*
-data/interim/*
-data/processed/*
-!data/raw/.gitkeep
-!data/interim/.gitkeep
-!data/processed/.gitkeep
-
-# Generated artefacts
-models/*
-# Ignore generated report outputs by default
-reports/figures/*
-reports/tables/*
-
-# Keep folders
-!reports/figures/.gitkeep
-!reports/tables/.gitkeep
-
-# Publish selected lightweight research results
-!reports/figures/*.png
-!reports/tables/*_metrics.json
-!reports/tables/*.csv
-
-# Editors and OS
-.vscode/
-.idea/
-.DS_Store
-Thumbs.db
-
-# Local review bundles
+# Local review and environment files
 _review_bundle/
-*-current.zip
-
-# Local environment snapshots
 environment_state.txt
 git_status.txt
 git_log.txt
 git_uncommitted_diff.txt
+
+# Temporary analysis outputs
+reports/tables/phase_d_smoke/
+reports/figures/phase_d_smoke/
+reports/tables/phase_e_smoke/
+reports/phase_d_smoke.md
+
+# Event-level derived market data
+reports/tables/phase_e_itch_*_events_sample.csv
+reports/tables/phase_e_itch_*_features_sample.csv
+
+# Large row-level simulations
+reports/tables/final_holdout_lightgbm_simulation.csv
+reports/tables/final_holdout_logistic_simulation.csv

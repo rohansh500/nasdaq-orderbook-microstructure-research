@@ -1,0 +1,27 @@
+{
+  "ticker": "AAPL",
+  "levels": 10,
+  "rows_loaded": 100000,
+  "time_start_seconds": 34200.004241176,
+  "time_end_seconds": 39546.128853328,
+  "timestamps_monotonic": true,
+  "duplicate_timestamp_fraction": 0.04495,
+  "crossed_book_rows": 0,
+  "locked_book_rows": 0,
+  "missing_values_total": 0,
+  "event_counts": {
+    "submission": 47901,
+    "partial_cancel": 599,
+    "deletion": 43092,
+    "visible_execution": 5507,
+    "hidden_execution": 2901
+  },
+  "median_interarrival_microseconds": 655.8484965353273,
+  "limited_depth_reconstruction": {
+    "audit_method": "one_step_reseeded_transition",
+    "events_checked": 9999,
+    "top_price_match_fraction": 1.0,
+    "top_state_match_fraction": 1.0,
+    "first_top_price_mismatch_event": null
+  }
+}
