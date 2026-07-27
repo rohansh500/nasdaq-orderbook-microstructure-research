@@ -16,14 +16,20 @@ data/processed/**
 !data/interim/.gitkeep
 !data/processed/.gitkeep
 
-models/
+# Local trained model artifacts
+/models/
 *.joblib
 *.pkl
 *.parquet
 *.itch
 *.onnx
 
-# Public browser model artifacts
+# Approved public browser model artifacts
+!web/
+!web/public/
+!web/public/models/
+!web/public/models/README.md
+!web/public/models/feature_manifest.json
 !web/public/models/classifier_h50_no_time.json
 !web/public/models/regressor_h50_no_time.json
 

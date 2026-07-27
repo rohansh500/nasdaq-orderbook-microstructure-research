@@ -1,0 +1,287 @@
+{
+  "modelsReady": true,
+  "modelVersion": "1.1.0",
+  "sourceConfigurationHash": "a00ddfe3f99164984dbe4217285238bba24ced6fca0aeb63ff385b9162191961",
+  "sourceGitCommit": "e4118d06570a28077192ef660e08a7c0b1ecfd0f",
+  "ticker": "AAPL",
+  "horizonEvents": 50,
+  "featureSet": "without_time",
+  "featureCount": 31,
+  "featureNames": [
+    "spread_bps",
+    "queue_imbalance_l1",
+    "microprice_deviation_bps",
+    "depth_imbalance_1",
+    "depth_imbalance_5",
+    "depth_imbalance_10",
+    "ofi_l1",
+    "event_interarrival_us",
+    "is_submission",
+    "is_partial_cancel",
+    "is_deletion",
+    "is_visible_execution",
+    "is_hidden_execution",
+    "event_intensity_20",
+    "ofi_l1_sum_20",
+    "add_pressure_20",
+    "cancel_pressure_20",
+    "trade_pressure_20",
+    "rolling_volatility_20",
+    "event_intensity_50",
+    "ofi_l1_sum_50",
+    "add_pressure_50",
+    "cancel_pressure_50",
+    "trade_pressure_50",
+    "rolling_volatility_50",
+    "event_intensity_100",
+    "ofi_l1_sum_100",
+    "add_pressure_100",
+    "cancel_pressure_100",
+    "trade_pressure_100",
+    "rolling_volatility_100"
+  ],
+  "featureRanges": {
+    "spread_bps": {
+      "p01": 0.5122129494765533,
+      "median": 2.738366222252099,
+      "p99": 6.326354395534001,
+      "minimum": 0.17008104361712864,
+      "maximum": 15.672112157810632
+    },
+    "queue_imbalance_l1": {
+      "p01": -0.9801980198019705,
+      "median": 0.0,
+      "p99": 0.9867549668874138,
+      "minimum": -0.9993751952514837,
+      "maximum": 0.9995130265400534
+    },
+    "microprice_deviation_bps": {
+      "p01": -2.084326590806305,
+      "median": -4.8760824578650765e-11,
+      "p99": 2.07990981249317,
+      "minimum": -6.990894650768949,
+      "maximum": 6.662231394472283
+    },
+    "depth_imbalance_1": {
+      "p01": -0.9801980198019705,
+      "median": 0.0,
+      "p99": 0.9867549668874138,
+      "minimum": -0.9993751952514837,
+      "maximum": 0.9995130265400534
+    },
+    "depth_imbalance_5": {
+      "p01": -0.8109600679694136,
+      "median": 0.09502923976608181,
+      "p99": 0.8882843955111238,
+      "minimum": -0.967928398284542,
+      "maximum": 0.983144714664098
+    },
+    "depth_imbalance_10": {
+      "p01": -0.7243947858472997,
+      "median": 0.08059113201566484,
+      "p99": 0.7814864263462393,
+      "minimum": -0.9217673814165042,
+      "maximum": 0.9553008595988537
+    },
+    "ofi_l1": {
+      "p01": -200.0,
+      "median": 0.0,
+      "p99": 150.0,
+      "minimum": -15000.0,
+      "maximum": 4580.0
+    },
+    "event_interarrival_us": {
+      "p01": 0.0,
+      "median": 647.2730019595474,
+      "p99": 1093355.3914947012,
+      "minimum": 0.0,
+      "maximum": 8155205.382005079
+    },
+    "is_submission": {
+      "p01": 0.0,
+      "median": 0.0,
+      "p99": 1.0,
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "is_partial_cancel": {
+      "p01": 0.0,
+      "median": 0.0,
+      "p99": 0.0,
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "is_deletion": {
+      "p01": 0.0,
+      "median": 0.0,
+      "p99": 1.0,
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "is_visible_execution": {
+      "p01": 0.0,
+      "median": 0.0,
+      "p99": 1.0,
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "is_hidden_execution": {
+      "p01": 0.0,
+      "median": 0.0,
+      "p99": 1.0,
+      "minimum": 0.0,
+      "maximum": 1.0
+    },
+    "event_intensity_20": {
+      "p01": 2.546159881455422,
+      "median": 29.036056560220473,
+      "p99": 4356.805443209659,
+      "minimum": 0.822083580449653,
+      "maximum": 20000000000000.0
+    },
+    "ofi_l1_sum_20": {
+      "p01": -1000.0,
+      "median": 0.0,
+      "p99": 902.0,
+      "minimum": -15123.0,
+      "maximum": 7452.0
+    },
+    "add_pressure_20": {
+      "p01": -0.6385696040868453,
+      "median": -0.03714354627523946,
+      "p99": 0.45589240939138354,
+      "minimum": -2.315394242803503,
+      "maximum": 2.911336568151741
+    },
+    "cancel_pressure_20": {
+      "p01": -0.4488938220746475,
+      "median": 0.03408110440034511,
+      "p99": 0.6496315330574478,
+      "minimum": -3.75674480318443,
+      "maximum": 2.9889992902767912
+    },
+    "trade_pressure_20": {
+      "p01": -0.2918537485857201,
+      "median": 0.0,
+      "p99": 0.28885037550548803,
+      "minimum": -2.185274592637295,
+      "maximum": 3.1492385786802015
+    },
+    "rolling_volatility_20": {
+      "p01": 0.0,
+      "median": 9.39635923095889e-06,
+      "p99": 7.071808430581492e-05,
+      "minimum": 0.0,
+      "maximum": 0.0001944099092159073
+    },
+    "event_intensity_50": {
+      "p01": 3.3477936016585375,
+      "median": 21.839710679419937,
+      "p99": 1356.3772958924624,
+      "minimum": 1.3211872428883003,
+      "maximum": 20504.48412278556
+    },
+    "ofi_l1_sum_50": {
+      "p01": -2007.0,
+      "median": -1.0,
+      "p99": 1600.0100000000093,
+      "minimum": -15475.0,
+      "maximum": 14268.0
+    },
+    "add_pressure_50": {
+      "p01": -1.3961038961038956,
+      "median": -0.09209809264305173,
+      "p99": 0.8885093167701861,
+      "minimum": -4.715248009797915,
+      "maximum": 6.678460858027419
+    },
+    "cancel_pressure_50": {
+      "p01": -0.8628897881456794,
+      "median": 0.08509036144578312,
+      "p99": 1.4147909967845655,
+      "minimum": -5.791242812914637,
+      "maximum": 5.057989690721646
+    },
+    "trade_pressure_50": {
+      "p01": -0.5518453427065024,
+      "median": 0.0,
+      "p99": 0.5175953079178884,
+      "minimum": -2.24562462281231,
+      "maximum": 6.4829493087557575
+    },
+    "rolling_volatility_50": {
+      "p01": 0.0,
+      "median": 1.1917635032140687e-05,
+      "p99": 6.520588213626015e-05,
+      "minimum": 0.0,
+      "maximum": 0.00018243501560898817
+    },
+    "event_intensity_100": {
+      "p01": 4.12317667503747,
+      "median": 19.160576340444976,
+      "p99": 487.71508763634404,
+      "minimum": 1.6863582592436284,
+      "maximum": 4624.234688358075
+    },
+    "ofi_l1_sum_100": {
+      "p01": -3134.0,
+      "median": -16.0,
+      "p99": 2434.140000000014,
+      "minimum": -15549.0,
+      "maximum": 15930.0
+    },
+    "add_pressure_100": {
+      "p01": -2.465623571856835,
+      "median": -0.19091991360784005,
+      "p99": 1.5534546771790196,
+      "minimum": -6.666666666666663,
+      "maximum": 7.050862450243252
+    },
+    "cancel_pressure_100": {
+      "p01": -1.4876547718521143,
+      "median": 0.17374624358173807,
+      "p99": 2.4477504749293937,
+      "minimum": -6.009287925696592,
+      "maximum": 6.650176678445226
+    },
+    "trade_pressure_100": {
+      "p01": -0.8438526607713865,
+      "median": 0.0,
+      "p99": 0.8259006438713723,
+      "minimum": -2.7537499999999984,
+      "maximum": 8.874369040942227
+    },
+    "rolling_volatility_100": {
+      "p01": 1.7205206139792014e-06,
+      "median": 1.2946256348567215e-05,
+      "p99": 6.217823878615877e-05,
+      "minimum": 0.0,
+      "maximum": 0.00014225112497537492
+    }
+  },
+  "inputType": "float64",
+  "classLabels": [
+    -1,
+    0,
+    1
+  ],
+  "classifier": {
+    "path": "/models/classifier_h50_no_time.json",
+    "sha256": "38ba6c7b9df8edaa99f8a7a714f1460aed8675ea745ee76ef7076cfb26b773f3",
+    "bytes": 943814
+  },
+  "regressor": {
+    "path": "/models/regressor_h50_no_time.json",
+    "sha256": "f78c310151963eb4600f5cd0f8db8887fee8c22d6b85a04a22372c1d77511242",
+    "bytes": 316650
+  },
+  "parity": {
+    "rows": 5000,
+    "rtol": 1e-10,
+    "atol": 1e-10,
+    "classifierMaximumAbsoluteDifference": 0.0,
+    "regressorMaximumAbsoluteDifference": 0.0,
+    "classLabelsExact": true
+  },
+  "scope": "Offline educational model trained on one historical AAPL stock-day. Synthetic scenario output is not a live forecast or trading recommendation."
+}
