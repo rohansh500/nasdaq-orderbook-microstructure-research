@@ -1,0 +1,129 @@
+{
+  "benchmark": {
+    "elapsed_seconds": 9102.219439000008,
+    "records_per_second": 40469.97948892228,
+    "target_book_events_per_second": 181.99923777952753,
+    "compressed_input_megabytes_per_second": 0.5234356436833424,
+    "peak_tracemalloc_megabytes": 303.59331
+  },
+  "binaryFile": {
+    "records_read": 368366634,
+    "payload_bytes_read": 10509149824,
+    "end_marker_seen": false,
+    "stopped_early": false,
+    "length_mismatches": 0,
+    "input_size_bytes": 4764426091,
+    "end_marker_required_only_for_complete_session": true,
+    "stop_reason": null
+  },
+  "reconstruction": {
+    "target_book_events": 1656597,
+    "target_non_book_trades": 11703,
+    "adds": 752975,
+    "executions": 89735,
+    "cancels": 5900,
+    "deletes": 685024,
+    "replaces": 122963,
+    "duplicate_order_references": 0,
+    "missing_target_order_references": 0,
+    "share_underflows": 0,
+    "timestamp_monotonicity_violations": 0,
+    "crossed_book_rows": 0,
+    "locked_book_rows": 0,
+    "max_open_orders": 42774,
+    "final_open_orders": 0
+  },
+  "integrity": {
+    "order_count": 0,
+    "bid_level_count": 0,
+    "ask_level_count": 0,
+    "bid_aggregate_matches_orders": true,
+    "ask_aggregate_matches_orders": true,
+    "bid_price_index_sorted": true,
+    "ask_price_index_sorted": true,
+    "nonpositive_orders": 0,
+    "valid": true
+  },
+  "messageCounts": [
+    {
+      "message_type": "A",
+      "count": 162970455
+    },
+    {
+      "message_type": "B",
+      "count": 116
+    },
+    {
+      "message_type": "C",
+      "count": 158886
+    },
+    {
+      "message_type": "D",
+      "count": 158273361
+    },
+    {
+      "message_type": "E",
+      "count": 8096995
+    },
+    {
+      "message_type": "F",
+      "count": 1725898
+    },
+    {
+      "message_type": "H",
+      "count": 8805
+    },
+    {
+      "message_type": "I",
+      "count": 3684511
+    },
+    {
+      "message_type": "J",
+      "count": 62
+    },
+    {
+      "message_type": "L",
+      "count": 193769
+    },
+    {
+      "message_type": "P",
+      "count": 1326184
+    },
+    {
+      "message_type": "Q",
+      "count": 17430
+    },
+    {
+      "message_type": "R",
+      "count": 8714
+    },
+    {
+      "message_type": "S",
+      "count": 6
+    },
+    {
+      "message_type": "U",
+      "count": 27222746
+    },
+    {
+      "message_type": "V",
+      "count": 1
+    },
+    {
+      "message_type": "X",
+      "count": 4669874
+    },
+    {
+      "message_type": "Y",
+      "count": 8821
+    }
+  ],
+  "headline": {
+    "records": 368366634,
+    "payloadGb": 10.51,
+    "targetEvents": 1656597,
+    "maxOrders": 42774,
+    "throughput": 40470,
+    "peakMb": 303.6
+  }
+}

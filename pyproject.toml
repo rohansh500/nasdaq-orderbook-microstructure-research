@@ -31,6 +31,8 @@ dev = [
   "pytest>=8,<9",
   "ruff>=0.5,<1",
 ]
+web-export = [
+]
 
 [tool.setuptools.packages.find]
 where = ["src"]

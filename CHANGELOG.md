@@ -2,6 +2,16 @@
 
 All notable public-release changes are documented here.
 
+## Unreleased
+
+### Added
+
+- Research-oriented Next.js research website with six interactive views.
+- Deterministic synthetic order-book scenario and 31-feature browser engine.
+- Offline compact LightGBM tree export with development-row parity validation.
+- Browser-side LightGBM tree inference without a Python API.
+- Vercel monorepo deployment, website CI, and public-safe aggregate JSON exports.
+
 ## 1.0.0 - 2026-07-27
 
 ### Added

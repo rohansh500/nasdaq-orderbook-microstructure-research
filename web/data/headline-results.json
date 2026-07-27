@@ -1,0 +1,89 @@
+{
+  "metrics": [
+    {
+      "label": "ITCH messages",
+      "value": "368.4M",
+      "detail": "market-wide records"
+    },
+    {
+      "label": "AAPL transitions",
+      "value": "1.66M",
+      "detail": "independently reconstructed"
+    },
+    {
+      "label": "Integrity failures",
+      "value": "0",
+      "detail": "tracked reconstruction invariants"
+    },
+    {
+      "label": "Holdout rank IC",
+      "value": "0.363",
+      "detail": "50-event LightGBM"
+    },
+    {
+      "label": "MAE improvement",
+      "value": "6.67%",
+      "detail": "versus zero-return baseline"
+    },
+    {
+      "label": "Gross vs cost",
+      "value": "0.289 / 1.854",
+      "detail": "bps per active signal"
+    }
+  ],
+  "conclusion": "The model captured statistically meaningful short-horizon price formation, but the observed gross edge was insufficient to cover aggressive execution costs.",
+  "configuration": {
+    "result_schema_version": "0.8.0",
+    "run_type": "frozen_candidate_holdout",
+    "ticker": "AAPL",
+    "levels": 10,
+    "horizon_events": 50,
+    "max_rows": null,
+    "rows_loaded": 400391,
+    "development_fraction": 0.8,
+    "exploratory_holdout_fraction": 0.19999999999999996,
+    "requested_purge_events": 100,
+    "effective_purge_events": 100,
+    "confidence_threshold": 0.1,
+    "feature_set": "without_time",
+    "feature_count": 31,
+    "feature_columns": [
+      "spread_bps",
+      "queue_imbalance_l1",
+      "microprice_deviation_bps",
+      "depth_imbalance_1",
+      "depth_imbalance_5",
+      "depth_imbalance_10",
+      "ofi_l1",
+      "event_interarrival_us",
+      "is_submission",
+      "is_partial_cancel",
+      "is_deletion",
+      "is_visible_execution",
+      "is_hidden_execution",
+      "event_intensity_20",
+      "ofi_l1_sum_20",
+      "add_pressure_20",
+      "cancel_pressure_20",
+      "trade_pressure_20",
+      "rolling_volatility_20",
+      "event_intensity_50",
+      "ofi_l1_sum_50",
+      "add_pressure_50",
+      "cancel_pressure_50",
+      "trade_pressure_50",
+      "rolling_volatility_50",
+      "event_intensity_100",
+      "ofi_l1_sum_100",
+      "add_pressure_100",
+      "cancel_pressure_100",
+      "trade_pressure_100",
+      "rolling_volatility_100"
+    ],
+    "candidate_frozen_before_holdout_run": true,
+    "holdout_status": "not_used_for_phase_a_to_c_lightgbm_candidate_selection; previously_inspected_with_exploratory_linear_baselines",
+    "no_holdout_threshold_or_feature_tuning": true,
+    "cost_assumption": "full_estimated_quoted_spread_crossing_cost",
+    "split_design": "first_80_percent_development_final_20_percent_holdout"
+  }
+}

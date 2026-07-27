@@ -49,6 +49,25 @@ flowchart LR
     end
 ```
 
+## Interactive research website
+
+The repository includes a research-oriented Next.js application in [`web/`](web/)
+with six public views:
+
+- a result-led project overview;
+- a synthetic order-book lifecycle replay;
+- a 31-feature prediction lab using browser-side LightGBM tree inference;
+- a walk-forward and feature-ablation explorer;
+- an execution-cost sensitivity lab;
+- an ITCH engineering and invariant dashboard.
+
+The site deploys no raw LOBSTER or Nasdaq rows and does not require a Python
+server. Scenario controls generate a deterministic 150-event synthetic history,
+derive the frozen feature vector, and run the verified classifier and regressor
+locally in the browser. The prediction page is explicitly an educational model
+response, not a live forecast or trading recommendation.
+
+
 ## Research question
 
 Does recent order flow contain incremental information about mid-price movement
@@ -192,9 +211,10 @@ docs/                      Design, results, protocols, and reproducibility
 notebooks/                  Executed research notebooks
 reports/figures/final/      Publication figures
 reports/tables/             Aggregate metrics and diagnostics
-scripts/                    PowerShell entry points
+scripts/                    PowerShell entry points and web export tools
 src/orderbook_research/     Reusable research and reconstruction code
 tests/                      Synthetic and integration tests
+web/                        Next.js interactive research website
 ```
 
 ## Setup on Windows
@@ -217,6 +237,24 @@ pytest
 
 The complete local environment runs 49 tests when PyArrow is installed. The
 real-Parquet test is skipped when PyArrow is unavailable.
+
+## Run the interactive website locally
+
+The aggregate site works immediately. To enable genuine browser inference, keep
+the two ignored Phase D joblib files and the local LOBSTER sample available, then
+run:
+
+```powershell
+.\scripts\setup_web_export.ps1
+.\scripts\run_web.ps1
+```
+
+The export step exports the frozen LightGBM pair as compact tree JSON and verifies prediction
+parity on development rows, profiles development-only feature ranges, and builds
+the website. Open `http://localhost:3000`.
+
+For Vercel, import this repository and set the project root directory to `web`.
+Set `NEXT_PUBLIC_SITE_URL` to the deployed URL.
 
 ## Reproduce the predictive pipeline
 
@@ -290,6 +328,7 @@ Full protocol details are in
 - [Data schema](docs/DATA_SCHEMA.md)
 - [Implementation history](docs/IMPLEMENTATION_HISTORY.md)
 - [Final research note](reports/final_research_note.md)
+- [Interactive website](docs/WEB_DEMO.md)
 - [Release notes](docs/RELEASE_NOTES_v1.0.0.md)
 
 ## Licence
