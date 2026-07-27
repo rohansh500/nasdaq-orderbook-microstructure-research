@@ -20,10 +20,9 @@ result large enough to survive an aggressive quoted-spread cost assumption?
 - Cost assumption: full estimated quoted-spread crossing cost
 
 The candidate and evaluation rules were frozen before this run. The final block
-was not used in Phases A-C to select the LightGBM no-time candidate. However,
-the same block had previously been inspected with exploratory linear baselines,
-so this is a configuration-level holdout rather than a completely untouched
-data set. Truly independent evidence requires additional trading days.
+was not used in Phases A-C to select the LightGBM no-time candidate. The same
+block had previously been inspected with exploratory linear baselines, so this
+is a configuration-level holdout rather than a completely untouched data set.
 
 ## Final classification result
 
@@ -56,25 +55,34 @@ At the frozen 0.10 confidence threshold:
 
 ## Interpretation
 
-The final result should be interpreted as evidence about short-horizon price
-formation, not as a deployable strategy. A positive rank IC or directional
-accuracy shows that the features contain information. Economic viability
-requires the gross edge to cover execution costs, latency, queue uncertainty,
-fees and model decay.
+The result supports short-horizon price predictability within the studied day,
+not a deployable strategy. Economic viability would require the gross edge to
+cover execution costs, latency, queue uncertainty, fees, impact, and model decay.
+
+## Raw ITCH engineering extension
+
+A separate streaming parser processed 368,366,634 market-wide Nasdaq ITCH
+messages and reconstructed 1,656,597 AAPL displayed-book transitions. All
+tracked order-reference, quantity, timestamp, aggregation, and crossed-book
+integrity checks passed.
+
+This 2019 reconstruction was not used as an out-of-day evaluation of the 2012
+predictive model.
 
 ## Limitations
 
-1. One stock and one trading day cannot establish out-of-day generalisation.
-2. LOBSTER provides reconstructed displayed-book snapshots rather than an
-   independently parsed raw ITCH feed.
+1. One stock and one predictive trading day cannot establish out-of-day
+   generalisation.
+2. The final block is a configuration-level holdout, not an independent day.
 3. The execution model assumes immediate aggressive fills and does not model
-   queue position, partial fills, latency or adverse selection.
-4. The final block was previously viewed for exploratory linear baselines,
-   although not for the frozen LightGBM no-time configuration.
-5. Feature importance is descriptive and is not a causal attribution.
+   queue position, partial fills, latency, fees, impact, or adverse selection.
+4. Feature importance is descriptive and is not a causal attribution.
+5. Independent ITCH reconstruction demonstrates engineering correctness, not
+   cross-day predictive stability.
 
-## Next research step
+## Potential extensions
 
-Phase E should add raw NASDAQ ITCH parsing and, when accessible, multiple days
-or instruments. That extension is required for a truly untouched temporal test
-and for independent order-book reconstruction benchmarks.
+Additional dates and instruments, probability calibration, passive execution,
+queue position, latency, partial fills, and market impact remain valid future
+research directions. They are not required for the v1.0.0 engineering and
+research release.

@@ -1,22 +1,35 @@
 # Nasdaq Order-Book Microstructure Research
 
-A leakage-controlled market-microstructure research pipeline and streaming
-Nasdaq TotalView-ITCH 5.0 order-book reconstruction engine implemented in
-Python.
+A Python research and market-data engineering project that combines:
+
+- leakage-controlled short-horizon price prediction using LOBSTER order-book data;
+- streaming Nasdaq TotalView-ITCH 5.0 binary parsing;
+- independent order-ID-level book reconstruction;
+- cost-aware evaluation that separates statistical predictability from executable alpha.
 
 ## Headline results
 
-- Parsed 368,366,634 market-wide ITCH messages and independently reconstructed
-  1,656,597 AAPL displayed-book transitions.
-- Maintained order-ID and aggregated price-level state with zero missing
-  references, share underflows, timestamp reversals, or crossed/locked snapshots.
-- Frozen 50-event LightGBM model achieved 0.363 rank IC, 46.19% balanced
-  classification accuracy, and 6.67% MAE improvement over a zero-return baseline.
-- Gross signal edge was 0.289 bps per active observation against an estimated
-  aggressive execution cost of 1.854 bps.
-- The result supports short-horizon price predictability, not a deployable
-  aggressive trading strategy.
+- Parsed **368,366,634** market-wide ITCH messages from the official January 30,
+  2019 sample.
+- Independently reconstructed **1,656,597 AAPL displayed-book transitions** while
+  maintaining order-ID state and aggregated bid/ask price levels.
+- Recorded **zero** missing order references, duplicate references, share
+  underflows, timestamp reversals, or crossed/locked exported snapshots.
+- A frozen 50-event LightGBM model achieved **0.363 rank IC**, **46.19% balanced
+  accuracy**, and **6.67% lower MAE** than a zero-return baseline on the final
+  configuration-level holdout.
+- The frozen signal produced **0.289 bps gross edge** per active observation
+  against **1.854 bps estimated aggressive execution cost**.
 
+The central conclusion is deliberately limited:
+
+> Order-book state and event-flow features contain short-horizon predictive
+> information, but the measured edge does not support repeated aggressive
+> spread-crossing execution.
+
+## Architecture
+
+```mermaid
 flowchart LR
     subgraph Prediction research
         A[LOBSTER messages and snapshots] --> B[Schema and transition audit]
@@ -24,7 +37,7 @@ flowchart LR
         C --> D[Purged walk-forward validation]
         D --> E[Bootstrap and diagnostics]
         E --> F[Regime and cost analysis]
-        F --> G[Linear vs LightGBM models]
+        F --> G[Linear and LightGBM models]
         G --> H[Frozen holdout evaluation]
     end
 
@@ -34,177 +47,96 @@ flowchart LR
         K --> L[Full-depth price aggregation]
         L --> M[Top-10 snapshots and invariant checks]
     end
+```
 
 ## Research question
 
-Does order-flow imbalance contain incremental information about short-horizon mid-price movement after accounting for spread, depth, event intensity, liquidity regime, and simple execution costs?
+Does recent order flow contain incremental information about mid-price movement
+over the next 10, 50, or 100 events after accounting for spread, displayed
+liquidity, volatility, event intensity, and simple execution costs?
 
-## Current findings
+## Data
 
-The initial experiment uses the complete public AAPL 10-level LOBSTER sample for June 21, 2012. Models are evaluated using contiguous purged chronological training, validation, and exploratory-holdout blocks. Rows are never randomly shuffled.
+### Predictive study
 
-### Classification results on the exploratory holdout
+The modelling experiment uses the public AAPL 10-level LOBSTER sample for
+June 21, 2012:
 
-| Horizon | Flat target share | Majority accuracy | Balanced-logistic accuracy | Balanced accuracy | Macro F1 |
-|---:|---:|---:|---:|---:|---:|
-| 10 events | 38.38% | 38.38% | 38.86% | 33.90% | 20.01% |
-| 50 events | 8.39% | 49.53% | 51.52% | 44.04% | 43.07% |
-| 100 events | 4.13% | 51.89% | 53.38% | 41.78% | 40.92% |
+- regular session: 09:30:00 to 16:00:00;
+- 400,391 aligned message and order-book rows;
+- forecast horizons: 10, 50, and 100 events;
+- 35 event-level and order-book features.
 
-The 10-event classifier provides little improvement over the majority baseline and remains dominated by the unchanged-price class. The 50-event horizon has the strongest balanced accuracy and macro F1, while the 100-event horizon has the highest raw accuracy. Because class proportions change sharply with the forecast horizon, raw accuracy is not sufficient by itself.
+LOBSTER supplies reconstructed displayed-book snapshots. The project validates
+message-to-snapshot transitions and uses those aligned rows for predictive
+research.
 
-### Regression and execution results on the exploratory holdout
+### Independent reconstruction study
 
-| Horizon | Zero-return MAE (bps) | Ridge MAE (bps) | Ridge rank IC | Non-zero directional accuracy | Gross edge per active signal (bps) | Estimated cost per active signal (bps) | Net edge per active signal (bps) | Break-even quoted-cost fraction |
-|---:|---:|---:|---:|---:|---:|---:|---:|---:|
-| 10 events | 0.189 | 0.198 | 0.276 | 65.25% | 0.114 | 1.818 | -1.704 | 6.27% |
-| 50 events | 0.555 | 0.540 | 0.288 | 62.44% | 0.295 | 1.795 | -1.500 | 16.45% |
-| 100 events | 0.878 | 0.867 | 0.247 | 57.87% | 0.389 | 1.825 | -1.438 | 21.36% |
+The engineering extension uses the official January 30, 2019 Nasdaq
+TotalView-ITCH 5.0 sample. The parser streams the compressed BinaryFILE and
+maintains individual order references plus aggregated price levels for AAPL.
 
-The Ridge model has positive rank information at all three horizons. The 50-event horizon produces the strongest rank IC and improves MAE over the zero-return baseline. At 10 events, Ridge improves RMSE and ranking but does not improve MAE, showing why multiple metrics and naive baselines are necessary.
+Raw data and large reconstructed outputs are intentionally excluded from Git.
+See [Data and licensing](docs/DATA_LICENSE.md).
 
-Gross edge per active signal rises with the prediction horizon, but estimated spread costs remain much larger than the forecast edge. Even at 100 events, the signal would break even only if realised execution costs were approximately 21% of the quoted aggressive-crossing estimate.
+## Validation design
 
-The current evidence therefore supports a limited conclusion:
+The research pipeline uses:
 
-> Order-book and order-flow features contain short-horizon predictive information, but the baseline signal is not economically executable under aggressive quoted-spread assumptions.
+- chronological splits only;
+- no random shuffling;
+- a 100-event purge between adjacent blocks;
+- training-only preprocessing;
+- five expanding walk-forward folds inside the first 80% of the day;
+- moving-block bootstrap intervals;
+- a candidate frozen before the final 20% configuration-level holdout;
+- non-overlapping signal observations for economic analysis.
 
-These results should not be interpreted as evidence of a deployable trading strategy. They are based on one stock and one trading day. The final block is an intraday exploratory holdout, not an untouched final test or evidence of out-of-day and cross-asset generalisation.
+The final block had previously been viewed using exploratory linear baselines,
+but it was not used to select the frozen LightGBM no-time candidate. It is
+therefore described as a **configuration-level holdout**, not a completely
+untouched independent test.
 
-## Methodological grounding
+## Final predictive results
 
-This is an independent research project that applies methods developed through MSc Financial Engineering training:
+The selected model uses a 50-event horizon and 31 features, excluding explicit
+clock-time variables.
 
-- **Financial data engineering:** explicit schemas, fixed-point price conversion, missing-level handling, transformation, feature construction, and reproducible data-quality checks.
-- **Financial econometrics:** return targets, correlation-based signal evaluation, chronological dependence controls, volatility features, and planned residual and bootstrap diagnostics.
-- **Machine learning in finance:** regularised linear models, class imbalance handling, training-only preprocessing, purged validation, and comparison against defensible naive baselines.
-- **Risk management:** gross-versus-net attribution, quoted-spread cost stress, break-even execution analysis, drawdown, and planned VaR and expected-shortfall diagnostics.
-- **Model-risk discipline:** failure analysis and explicit separation between statistical predictability and executable alpha.
+| Model | Balanced accuracy | Macro F1 | MAE (bps) | MAE improvement vs zero | Rank IC | Non-zero directional accuracy |
+|---|---:|---:|---:|---:|---:|---:|
+| Balanced logistic / Ridge | 43.20% | 0.392 | 0.541 | +2.35% | 0.288 | 63.03% |
+| LightGBM | **46.19%** | **0.456** | **0.518** | **+6.67%** | **0.363** | **65.29%** |
 
-Deep-learning sequence models are deliberately deferred until more dates or raw ITCH samples provide enough independent training and validation data.
+Feature-family ablation showed that event-flow features were essential. At the
+50-event horizon, removing order-flow and event-pressure features reduced rank
+IC from 0.266 to 0.048 and reduced gross edge from 0.182 bps to 0.010 bps.
+Removing explicit time features improved the development-fold average, which
+suggests that raw clock-time variables encouraged unstable intraday shortcuts.
 
-## Initial data path
+Detailed fold, bootstrap, diagnostic, regime, and ablation results are in
+[docs/RESULTS.md](docs/RESULTS.md).
 
-The first reproducible experiment uses the public AAPL LOBSTER sample:
+## Execution result
 
-- date: 2012-06-21;
-- session: 09:30:00-16:00:00;
-- depth: 10 occupied price levels;
-- two row-aligned, headerless CSV files:
-  - message events;
-  - order-book snapshots after each event.
+At the frozen 0.10 confidence threshold:
 
-The raw files are downloaded from a public Hugging Face mirror. They are not committed to Git.
+| Model | Active fraction | Gross edge per active signal | Estimated cost per active signal | Net edge per active signal | Break-even cost fraction |
+|---|---:|---:|---:|---:|---:|
+| Balanced logistic | 54.22% | 0.303 bps | 1.776 bps | -1.472 bps | 17.08% |
+| LightGBM | 69.83% | 0.289 bps | 1.854 bps | -1.564 bps | 15.62% |
 
-## What the repository builds
+The statistical model is useful for studying price formation, but the forecast
+magnitude is far below the assumed aggressive crossing cost. The repository
+therefore does not present the result as a deployable strategy.
 
-1. Raw-file ingestion with explicit schemas and fixed-point price conversion.
-2. Message/snapshot row-alignment and quality checks.
-3. A one-step limited-depth price-level reconstruction audit.
-4. Event-level order-book and order-flow features.
-5. Future mid-price classification and regression targets at 10, 50, and 100 event horizons.
-6. Purged chronological training, validation, and exploratory-holdout blocks.
-7. Majority and class-balanced logistic classification baselines.
-8. Zero-return and Ridge regression baselines.
-9. Statistical and spread-aware economic evaluation.
-10. Reproducible JSON metrics, model artefacts, tests, and research documentation.
-
-Planned additions include walk-forward validation, dependence-aware inference, spread/liquidity/time-of-day regime analysis, cost stress testing, LightGBM comparison, feature-family ablation, a chart pack, and a short research note.
-
-## Important terminology
-
-LOBSTER already reconstructs the order-book snapshots from NASDAQ ITCH. In the LOBSTER phase, this repository:
-
-- validates message-to-snapshot transitions;
-- reconstructs a limited price-level state from the supplied event stream;
-- engineers predictive features from aligned messages and snapshots.
-
-A true full-depth reconstruction from raw binary ITCH is a separate later phase.
-
-## Repository structure
-
-```text
-configs/                    Experiment settings
-data/                       Local-only raw and processed data
-docs/                       Research design and report outline
-models/                     Generated model artefacts
-notebooks/                  Auditable exploration
-reports/figures/            Generated charts
-reports/tables/             Metrics and diagnostics
-scripts/                    Windows PowerShell entry points
-src/orderbook_research/     Reusable pipeline code
-tests/                      Synthetic unit tests
-```
-
-## Windows setup
-
-```powershell
-Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
-.\scripts\setup.ps1
-.venv\Scripts\Activate.ps1
-```
-
-## Download the public AAPL sample
-
-```powershell
-.\scripts\download_lobster.ps1
-```
-
-Expected local files:
-
-```text
-data/raw/lobster/AAPL_10/
-AAPL_2012-06-21_34200000_57600000_message_10.csv
-AAPL_2012-06-21_34200000_57600000_orderbook_10.csv
-```
-
-No Kaggle account, API key, or Hugging Face account is required for the public repository.
-
-## Run Phase 0 checks
-
-```powershell
-python -m orderbook_research.audit --levels 10 --max-rows 100000
-pytest
-python -m orderbook_research.smoke_test
-```
-
-The audit writes:
-
-```text
-reports/tables/data_audit.json
-```
-
-## Reproduce all baseline experiments
-
-Run all three event horizons with the same model and evaluation configuration:
-
-```powershell
-.\scripts\run_all_baselines.ps1
-```
-
-The script generates:
-
-```text
-reports/tables/baseline_h10_metrics.json
-reports/tables/baseline_h50_metrics.json
-reports/tables/baseline_h100_metrics.json
-```
-
-A single horizon can also be run directly:
-
-```powershell
-python -m orderbook_research.train_baseline `
-    --ticker AAPL `
-    --levels 10 `
-    --horizon 50
-```
-## Final evaluation figures
+## Final figures
 
 ### Return-ranking performance
 
 ![Final return-ranking comparison](reports/figures/final/final_rank_ic.png)
 
-### Gross edge versus execution cost
+### Gross edge versus estimated execution cost
 
 ![Gross edge versus estimated execution cost](reports/figures/final/final_signal_economics.png)
 
@@ -212,21 +144,156 @@ python -m orderbook_research.train_baseline `
 
 ![Cumulative net result](reports/figures/final/final_cumulative_net.png)
 
-## Leakage controls
+## Raw ITCH reconstruction results
 
-- Rows are never randomly shuffled before splitting.
-- Splits are contiguous in event time.
-- A purge gap of at least the maximum target horizon separates adjacent blocks.
-- Imputers and scalers are fitted using training observations only.
-- Future mid-price values are used only for target construction and evaluation.
-- Rolling features use current and past observable events only.
-- The final block is described as an exploratory holdout because it has been inspected during model development.
-- Stronger claims are deferred until purged walk-forward and multi-day evaluation are available.
+| Metric | Result |
+|---|---:|
+| Market-wide records processed | 368,366,634 |
+| Binary payload processed | 10.51 GB |
+| AAPL displayed-book transitions | 1,656,597 |
+| Maximum simultaneous AAPL orders | 42,774 |
+| Missing order references | 0 |
+| Duplicate order references | 0 |
+| Share underflows | 0 |
+| Timestamp reversals | 0 |
+| Crossed or locked snapshots | 0 |
+| Final open orders | 0 |
+| Processing throughput | 40,470 records/second |
+| Python-tracked peak allocation | 303.6 MB |
 
-## One-day limitation
+The complete compressed session was consumed to clean gzip EOF without
+truncated records, payload-length mismatches, or decompression errors. The
+sample did not expose a zero-length BinaryFILE terminator.
 
-The public sample provides one date. Chronological intraday evaluation controls leakage but does not establish day-to-day stability. Stronger validation requires additional dates from licensed LOBSTER data or reconstructed official ITCH samples.
+Phase E is an independent market-data engineering benchmark. It was not used to
+claim that the 2012 predictive model generalises to the 2019 session.
 
-## Data and licensing
+## Supported ITCH order lifecycle
 
-This repository contains code and lightweight derived metrics only. Review the source dataset's terms before redistributing data. Do not commit the raw CSV files. Publish code, aggregate metrics, figures, and executed notebook outputs; do not publish raw or event-level market data.
+The reconstruction engine handles:
+
+- `A` and `F`: add order;
+- `E` and `C`: visible execution;
+- `X`: partial cancellation;
+- `D`: deletion;
+- `U`: cancel-replace.
+
+Replace messages are processed atomically while retaining the old and new order
+references, sizes, and prices. Non-displayed `P` trades are counted but do not
+modify the displayed book.
+
+## Repository structure
+
+```text
+.github/workflows/          Continuous integration
+configs/                    Reproducible experiment settings
+data/                       Local-only raw and processed data
+docs/                      Design, results, protocols, and reproducibility
+notebooks/                  Executed research notebooks
+reports/figures/final/      Publication figures
+reports/tables/             Aggregate metrics and diagnostics
+scripts/                    PowerShell entry points
+src/orderbook_research/     Reusable research and reconstruction code
+tests/                      Synthetic and integration tests
+```
+
+## Setup on Windows
+
+Python 3.11 or newer is required.
+
+```powershell
+Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
+.\scripts\setup.ps1
+.venv\Scripts\Activate.ps1
+```
+
+Run quality checks:
+
+```powershell
+python -m ruff check src tests
+python -m ruff format --check src tests
+pytest
+```
+
+The complete local environment runs 49 tests when PyArrow is installed. The
+real-Parquet test is skipped when PyArrow is unavailable.
+
+## Reproduce the predictive pipeline
+
+Download the public LOBSTER sample:
+
+```powershell
+.\scripts\download_lobster.ps1
+```
+
+Run the stages:
+
+```powershell
+.\scripts\run_phase0.ps1
+.\scripts\run_all_baselines.ps1
+.\scripts\run_walk_forward.ps1
+.\scripts\run_bootstrap.ps1
+.\scripts\run_diagnostics.ps1
+.\scripts\run_phase_b.ps1
+.\scripts\run_phase_c.ps1
+```
+
+The frozen holdout protocol and execution instructions are documented in
+[docs/FINAL_EVALUATION_PROTOCOL.md](docs/FINAL_EVALUATION_PROTOCOL.md). The
+runner intentionally prevents accidental repeated final evaluations unless an
+explicit override is provided.
+
+## Reproduce the ITCH reconstruction
+
+Run the synthetic smoke test first:
+
+```powershell
+.\scripts\run_phase_e.ps1 -Smoke
+```
+
+Download the large official sample:
+
+```powershell
+.\scripts\download_itch_sample.ps1 -ConfirmLargeDownload
+```
+
+Run a limited reconstruction before processing the complete session:
+
+```powershell
+.\scripts\run_phase_e.ps1 `
+    -InputPath "data\raw\itch\01302019.NASDAQ_ITCH50.gz" `
+    -Symbol AAPL `
+    -Levels 10 `
+    -StopAfterTargetEvents 250000
+```
+
+Full protocol details are in
+[docs/ITCH_RECONSTRUCTION_PROTOCOL.md](docs/ITCH_RECONSTRUCTION_PROTOCOL.md).
+
+## Limitations
+
+- The predictive study uses one stock and one trading day.
+- The final block is a configuration-level holdout, not an independent day.
+- The execution model assumes immediate aggressive fills and omits latency,
+  queue position, partial fills, fees, market impact, and capacity.
+- Gain importance is descriptive and not causal.
+- The raw ITCH reconstruction validates engineering correctness but does not
+  provide cross-day model validation.
+
+## Documentation
+
+- [Research design](docs/RESEARCH_DESIGN.md)
+- [Consolidated results](docs/RESULTS.md)
+- [Reproducibility guide](docs/REPRODUCIBILITY.md)
+- [Final evaluation protocol](docs/FINAL_EVALUATION_PROTOCOL.md)
+- [ITCH reconstruction protocol](docs/ITCH_RECONSTRUCTION_PROTOCOL.md)
+- [Data schema](docs/DATA_SCHEMA.md)
+- [Implementation history](docs/IMPLEMENTATION_HISTORY.md)
+- [Final research note](reports/final_research_note.md)
+- [Release notes](docs/RELEASE_NOTES_v1.0.0.md)
+
+## Licence
+
+The source code is released under the MIT License. Market data remains subject
+to the terms of its original provider. The repository does not grant rights to
+Nasdaq or LOBSTER data.

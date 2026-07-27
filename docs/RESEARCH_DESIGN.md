@@ -2,56 +2,97 @@
 
 ## Primary hypothesis
 
-Recent order-flow imbalance predicts the sign and magnitude of short-horizon mid-price movement.
+Recent order-flow imbalance and event activity contain information about the
+sign and magnitude of short-horizon mid-price movement.
 
 ## Secondary hypotheses
 
-1. Queue and depth imbalance are more informative when the spread is one tick.
-2. Cancellation pressure and aggressive trade pressure add information beyond static depth.
-3. Predictability decays as the event horizon increases.
-4. Apparent directional accuracy does not necessarily survive spread costs.
-5. Performance varies materially across time-of-day and liquidity regimes.
+1. Dynamic event-flow features add information beyond static book state.
+2. Predictability varies across spread, depth, volatility, and intraday regimes.
+3. Non-linear models improve ranking and classification relative to regularised
+   linear baselines.
+4. Statistical predictability does not necessarily survive execution costs.
+5. A raw ITCH parser can independently reproduce displayed-book state while
+   satisfying order and price-level invariants.
 
 ## Prediction tasks
 
-### Classification
-
 For horizons of 10, 50, and 100 future events:
 
-- `-1`: future mid-price lower than current mid-price
-- `0`: unchanged
-- `1`: future mid-price higher than current mid-price
+- classification labels are down, unchanged, and up;
+- regression targets are future mid-price returns in basis points.
 
-### Regression
+## Feature groups
 
-Future mid-price return in basis points at the same event horizons.
+The 35-feature baseline schema contains:
+
+- spread, microprice, queue imbalance, and multi-level depth imbalance;
+- best-quote order-flow imbalance;
+- submission, cancellation, deletion, and execution indicators;
+- rolling add, cancel, trade, OFI, event-intensity, and volatility features;
+- explicit time-of-day variables, later removed from the frozen candidate after
+  development-only ablation.
 
 ## Leakage controls
 
-- Contiguous event-time splits only
-- No random train/test split
-- Purge gap of at least the largest label horizon
-- Training-only imputation and scaling
-- Targets constructed only with future mid prices
-- Rolling features contain no future rows
-- Test block remains untouched until model and thresholds are frozen
+- Contiguous event-time splits only.
+- No random train/test split.
+- A 100-event purge between adjacent blocks.
+- Training-only imputation and scaling.
+- Rolling features use only current and historical observations.
+- Five expanding walk-forward folds are restricted to the first 80% of the day.
+- The candidate model, horizon, feature family, confidence threshold, and cost
+  assumption were frozen before configuration-level holdout evaluation.
+
+The final 20% had previously been viewed with exploratory linear baselines. It
+was not used to select the final LightGBM no-time candidate, so the result is a
+configuration-level holdout rather than a completely untouched test.
+
+## Model comparison
+
+The project compares:
+
+- majority classification;
+- class-balanced logistic regression;
+- zero-return regression;
+- Ridge regression;
+- fixed-parameter LightGBM classification and regression.
+
+No validation-driven LightGBM hyperparameter search or early stopping was used.
+Feature-family ablation was performed only on development folds.
+
+## Dependence-aware inference
+
+Moving-block bootstrap intervals use 1,000-event blocks and 1,000 draws.
+Residual diagnostics include autocorrelation, Ljung-Box tests, calibration,
+skewness, kurtosis, and intraday time buckets.
 
 ## Economic simulation
 
-The initial simulation:
+The simulation:
 
 - samples non-overlapping observations at the target horizon;
-- uses `P(up) - P(down)` as the signal score;
-- applies a confidence threshold;
+- uses classifier probability imbalance as the signal score;
+- applies a fixed confidence threshold;
 - measures future mid-price return;
-- subtracts half the current spread and half the future spread;
-- reports gross return, net return, active-signal rate, and drawdown.
+- subtracts estimated entry and exit spread costs;
+- reports activity, gross edge, net edge, break-even cost fraction, and drawdown.
 
-This is deliberately conservative but still incomplete. It does not model latency, queue position, partial fills, market impact, order types, fees, or capacity.
+It does not model latency, queue position, partial fills, fees, market impact,
+order types, adverse selection, or capacity.
 
-## Validation limitation
+## Raw ITCH reconstruction boundary
 
-The public sample contains a single trading day. Chronological intraday testing is valid for leakage control but insufficient for claims about out-of-day robustness. The final report must distinguish:
+The independent ITCH path maintains order-ID-level state and full aggregated
+visible depth for one symbol. It exports top-N snapshots and checks:
 
-- intraday holdout performance;
-- true multi-day generalisation, which is not tested initially.
+- duplicate and missing order references;
+- quantity underflows;
+- timestamp monotonicity;
+- order-to-level conservation;
+- sorted price indices;
+- crossed and locked exported snapshots;
+- final state integrity.
+
+This engineering result is separate from the 2012 predictive experiment and is
+not treated as cross-day model validation.

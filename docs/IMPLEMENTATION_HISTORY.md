@@ -1,79 +1,53 @@
-# Project execution plan
+# Implementation history
 
-End each phase with a focused Git commit.
+The repository was developed through a sequence of independently testable
+milestones.
 
-## Phase 0 - Reproducible repository
-- Create and activate the virtual environment
-- Download AAPL 10-level sample files
-- Run audit, tests, and synthetic smoke test
-- Commit: `chore: initialise order-book research repository`
+## 1. Data integrity and transition audit
 
-## Phase 1 - Data integrity and microstructure audit
-- Verify message and order-book row alignment
--  Inspect event-type frequencies
--  Inspect timestamp monotonicity and duplicate timestamps
--  Detect crossed or locked books
--  Clean dummy empty-level values
--  Validate visible-event snapshot transitions
-- Commit: `research: audit lobster event and snapshot data`
+- Added explicit LOBSTER schemas and fixed-point price conversion.
+- Verified message and snapshot row alignment.
+- Audited event frequencies, timestamps, dummy levels, and crossed/locked books.
+- Implemented a one-step limited-depth reconstruction audit.
 
-## Phase 2 - Price-level reconstruction audit
--  Seed the local price-level book from a snapshot
--  Apply submissions, cancellations, deletions, and visible executions
--  Compare reconstructed and supplied top-of-book states
--  Document why limited-depth input cannot guarantee full reconstruction
-- Commit: `feat: add price-level reconstruction audit`
+## 2. Features, targets, and linear baselines
 
-## Phase 3 - Leakage-safe features and targets
--  Spread, mid, microprice, queue imbalance
--  Multi-level depth imbalance
--  Best-quote order-flow imbalance
--  Add/cancel/trade pressure
--  Event intensity and inter-arrival time
--  Rolling volatility and time-of-day features
--  Targets at 10, 50, and 100 events
-- Commit: `feat: build event-level microstructure features`
+- Built 35 order-book, event-flow, volatility, and time features.
+- Added 10-, 50-, and 100-event classification and regression targets.
+- Established majority, balanced-logistic, zero-return, and Ridge baselines.
+- Added spread-aware non-overlapping signal simulation.
 
-## Phase 4 - Baselines
--  Majority classifier
--  Logistic regression
--  Zero-return and Ridge regression
--  Freeze validation metrics and thresholds
-- Commit: `model: establish linear event-horizon baselines`
+## 3. Robustness analysis
 
-## Phase 5 - Non-linear models
--  LightGBM classifier and regressor
--  Feature-family ablation
--  Seed and hyperparameter stability
-- Commit: `model: add gradient-boosted order-book models`
+- Added five purged expanding walk-forward folds.
+- Added moving-block bootstrap confidence intervals.
+- Added residual autocorrelation, Ljung-Box, calibration, and time-bucket
+  diagnostics.
+- Added depth, volatility, confidence-threshold, and cost-regime analysis.
 
-## Phase 6 - Economic evaluation
--  Non-overlapping signal observations
--  Confidence threshold
--  Gross future mid-price return
--  Half-spread entry and exit cost
--  Net PnL and drawdown
--  Performance by spread and liquidity regime
-- Commit: `research: add spread-aware signal simulation`
+## 4. Non-linear modelling and ablation
 
-## Phase 7 - Failure analysis
--  Class imbalance and flat-state dominance
--  Time-of-day dependence
--  Spread and depth dependence
--  Latency and fill-probability limitations
--  One-day generalisation limitation
-- Commit: `research: document robustness and failure modes`
+- Compared fixed-parameter LightGBM with linear baselines.
+- Added feature-family ablation.
+- Selected the 50-event no-time candidate using development folds only.
 
-## Phase 8 - Raw NASDAQ ITCH extension
--  Download an official sample binary
--  Parse length-prefixed ITCH 5.0 messages
--  Build order-ID state and full price levels
--  Validate against independent aggregates
-- Commit: `feat: reconstruct book from raw itch messages`
+## 5. Frozen holdout evaluation
 
-## Phase 9 - Publication
--  Final README with verified numbers only
--  Three-to-five-page research note
--  Chart pack and tables
--  GitHub repository creation and push
-- Commit: `docs: publish reproducible microstructure study`
+- Committed the evaluation protocol before running the selected candidate.
+- Recorded the Git commit, configuration hash, Python version, and split rules.
+- Generated final predictive, economic, importance, and drawdown outputs.
+
+## 6. Independent Nasdaq ITCH reconstruction
+
+- Added streaming BinaryFILE parsing for the displayed-order lifecycle.
+- Maintained individual order references and aggregated price levels.
+- Added stable batched Parquet output and regular-session samples.
+- Reconstructed the complete AAPL session from the official January 30, 2019
+  sample with all tracked integrity checks passing.
+
+## 7. Public release
+
+- Consolidated results and limitations.
+- Added reproducibility, licensing, citation, CI, figures, and release metadata.
+- Removed raw, event-level, smoke, model-binary, and large simulation outputs
+  from the public repository.

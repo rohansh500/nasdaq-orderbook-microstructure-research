@@ -56,6 +56,7 @@ def main() -> None:
         stop_after_target_events=args.stop_after_target_events,
         batch_size=args.batch_size,
         sample_rows=args.sample_rows,
+        sample_start_seconds=args.sample_start_seconds,
         strict=not args.non_strict,
     )
     print(json.dumps(result, indent=2, default=str))

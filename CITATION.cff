@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software or research workflow, please cite it as below."
+title: "Nasdaq Order-Book Microstructure Research"
+type: software
+authors:
+  - family-names: Sharma
+    given-names: Rohan
+version: 1.0.0
+date-released: 2026-07-27
+license: MIT
+abstract: >-
+  A leakage-controlled market-microstructure research pipeline and streaming
+  Nasdaq TotalView-ITCH 5.0 order-book reconstruction engine implemented in
+  Python.
+keywords:
+  - market microstructure
+  - order book
+  - Nasdaq ITCH
+  - quantitative finance
+  - LightGBM

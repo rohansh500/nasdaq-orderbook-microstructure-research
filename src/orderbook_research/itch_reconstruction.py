@@ -300,6 +300,7 @@ def reconstruct_itch_file(
             "stop_after_target_events": stop_after_target_events,
             "batch_size": batch_size,
             "sample_rows": sample_rows,
+            "sample_start_seconds": sample_start_seconds,
             "price_precision": 4,
             "replace_event_type": 8,
         },

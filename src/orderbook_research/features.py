@@ -150,7 +150,11 @@ def add_snapshot_features(
             df["mid_log_return"].rolling(window, min_periods=max(2, window // 4)).std()
         )
 
-    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    numeric_columns = df.select_dtypes(include=[np.number]).columns
+    df.loc[:, numeric_columns] = df.loc[:, numeric_columns].replace(
+        [np.inf, -np.inf],
+        np.nan,
+    )
     return df
 
 

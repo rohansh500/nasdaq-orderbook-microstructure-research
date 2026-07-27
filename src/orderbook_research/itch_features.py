@@ -55,5 +55,9 @@ def add_itch_snapshot_features(
             normaliser,
         )
 
-    df.replace([np.inf, -np.inf], np.nan, inplace=True)
+    numeric_columns = df.select_dtypes(include=[np.number]).columns
+    df.loc[:, numeric_columns] = df.loc[:, numeric_columns].replace(
+        [np.inf, -np.inf],
+        np.nan,
+    )
     return df

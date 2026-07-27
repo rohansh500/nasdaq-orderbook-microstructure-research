@@ -51,6 +51,7 @@ def test_reconstruction_runner_writes_outputs(
     )
 
     assert result["configuration"]["result_schema_version"] == "0.9.0"
+    assert result["configuration"]["sample_start_seconds"] == 34_200.0
     assert result["reconstruction"]["target_book_events"] == 9
     assert result["final_integrity"]["valid"] is True
     assert result["outputs"]["parquet_rows"] == 9

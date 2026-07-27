@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from lightgbm import LGBMClassifier, LGBMRegressor
+from matplotlib.ticker import FuncFormatter
 from sklearn.impute import SimpleImputer
 from sklearn.linear_model import LogisticRegression, Ridge
 from sklearn.pipeline import Pipeline
@@ -256,6 +257,25 @@ def _save_figure(path: Path) -> None:
     plt.close()
 
 
+def _model_label(model: str) -> str:
+    labels = {
+        "majority_classifier": "Majority baseline",
+        "balanced_logistic": "Balanced logistic",
+        "zero_return": "Zero-return baseline",
+        "ridge": "Ridge",
+        "lightgbm_classifier": "LightGBM",
+        "lightgbm_regressor": "LightGBM",
+    }
+    return labels.get(model, model.replace("_", " ").title())
+
+
+def _clock_time_label(seconds: float, _: float) -> str:
+    rounded = max(0, int(round(seconds)))
+    hours, remainder = divmod(rounded, 3600)
+    minutes = remainder // 60
+    return f"{hours:02d}:{minutes:02d}"
+
+
 def generate_final_figures(
     *,
     figure_directory: Path,
@@ -279,86 +299,104 @@ def generate_final_figures(
     _save_figure(path)
     generated.append(path.name)
 
+    classification_plot = classification_rows.copy()
+    classification_plot["model_label"] = classification_plot["model"].map(_model_label)
+
     plt.figure(figsize=(8, 4.5))
     plt.bar(
-        classification_rows["model"],
-        classification_rows["balanced_accuracy"],
+        classification_plot["model_label"],
+        classification_plot["balanced_accuracy"],
     )
     plt.axhline(1.0 / 3.0, linestyle="--", linewidth=1)
     plt.ylabel("Balanced accuracy")
     plt.title("Final classification comparison")
-    plt.xticks(rotation=15)
+    plt.xticks(rotation=12)
     path = figure_directory / "final_balanced_accuracy.png"
     _save_figure(path)
     generated.append(path.name)
 
     plt.figure(figsize=(8, 4.5))
     plt.bar(
-        classification_rows["model"],
-        classification_rows["macro_f1"],
+        classification_plot["model_label"],
+        classification_plot["macro_f1"],
     )
     plt.ylabel("Macro F1")
     plt.title("Final macro F1 comparison")
-    plt.xticks(rotation=15)
+    plt.xticks(rotation=12)
     path = figure_directory / "final_macro_f1.png"
     _save_figure(path)
     generated.append(path.name)
 
+    regression_plot = regression_rows.copy()
+    regression_plot["model_label"] = regression_plot["model"].map(_model_label)
+
     plt.figure(figsize=(8, 4.5))
-    plt.bar(regression_rows["model"], regression_rows["mae_bps"])
+    plt.bar(regression_plot["model_label"], regression_plot["mae_bps"])
     plt.ylabel("MAE (bps)")
     plt.title("Final return-forecast MAE")
-    plt.xticks(rotation=15)
+    plt.xticks(rotation=12)
     path = figure_directory / "final_regression_mae.png"
     _save_figure(path)
     generated.append(path.name)
 
     plt.figure(figsize=(8, 4.5))
-    plt.bar(regression_rows["model"], regression_rows["rank_ic"])
+    plt.bar(regression_plot["model_label"], regression_plot["rank_ic"])
     plt.axhline(0.0, linewidth=1)
     plt.ylabel("Spearman rank IC")
     plt.title("Final return-ranking comparison")
-    plt.xticks(rotation=15)
+    plt.xticks(rotation=12)
     path = figure_directory / "final_rank_ic.png"
     _save_figure(path)
     generated.append(path.name)
 
     plt.figure(figsize=(8, 4.5))
     plt.bar(
-        regression_rows["model"],
-        regression_rows["nonzero_directional_accuracy"],
+        regression_plot["model_label"],
+        regression_plot["nonzero_directional_accuracy"],
     )
     plt.axhline(0.50, linestyle="--", linewidth=1)
     plt.ylabel("Accuracy")
     plt.title("Direction accuracy when the mid-price moves")
-    plt.xticks(rotation=15)
+    plt.xticks(rotation=12)
     path = figure_directory / "final_nonzero_directional_accuracy.png"
     _save_figure(path)
     generated.append(path.name)
 
-    edge_frame = economics_rows.set_index("model")[
+    economics_plot = economics_rows.copy()
+    economics_plot["model_label"] = economics_plot["model"].map(_model_label)
+    edge_frame = economics_plot.set_index("model_label")[
         [
             "mean_gross_return_active_bps",
             "mean_estimated_cost_active_bps",
             "mean_net_return_active_bps",
         ]
-    ]
+    ].rename(
+        columns={
+            "mean_gross_return_active_bps": "Gross edge",
+            "mean_estimated_cost_active_bps": "Estimated crossing cost",
+            "mean_net_return_active_bps": "Net edge",
+        }
+    )
     plt.figure(figsize=(9, 5))
     edge_frame.plot(kind="bar", ax=plt.gca())
     plt.axhline(0.0, linewidth=1)
+    plt.xlabel("")
     plt.ylabel("Basis points per active signal")
     plt.title("Final signal economics at the frozen threshold")
-    plt.xticks(rotation=15)
+    plt.xticks(rotation=12)
     path = figure_directory / "final_signal_economics.png"
     _save_figure(path)
     generated.append(path.name)
+
+    time_formatter = FuncFormatter(_clock_time_label)
 
     plt.figure(figsize=(9, 4.5))
     plt.plot(
         selected_simulation["time_seconds"],
         selected_simulation["gross_return_bps"].fillna(0).cumsum(),
     )
-    plt.xlabel("Seconds from midnight")
+    plt.gca().xaxis.set_major_formatter(time_formatter)
+    plt.xlabel("Exchange time")
     plt.ylabel("Cumulative gross return (bps)")
     plt.title("Frozen LightGBM cumulative gross signal return")
     path = figure_directory / "final_cumulative_gross.png"
@@ -370,7 +408,8 @@ def generate_final_figures(
         selected_simulation["time_seconds"],
         selected_simulation["cumulative_net_bps"],
     )
-    plt.xlabel("Seconds from midnight")
+    plt.gca().xaxis.set_major_formatter(time_formatter)
+    plt.xlabel("Exchange time")
     plt.ylabel("Cumulative net return (bps)")
     plt.title("Frozen LightGBM cumulative net signal return")
     path = figure_directory / "final_cumulative_net.png"
@@ -382,7 +421,8 @@ def generate_final_figures(
         selected_simulation["time_seconds"],
         selected_simulation["drawdown_bps"],
     )
-    plt.xlabel("Seconds from midnight")
+    plt.gca().xaxis.set_major_formatter(time_formatter)
+    plt.xlabel("Exchange time")
     plt.ylabel("Drawdown (bps)")
     plt.title("Frozen LightGBM net-return drawdown")
     path = figure_directory / "final_drawdown.png"
@@ -421,7 +461,10 @@ def write_research_note(
     zero = regression["zero_return"]
     lightgbm_econ = economics["lightgbm_classifier"]
 
-    mae_improvement = percentage_improvement(float(zero["mae_bps"]), float(lightgbm_reg["mae_bps"]))
+    mae_improvement = percentage_improvement(
+        float(zero["mae_bps"]),
+        float(lightgbm_reg["mae_bps"]),
+    )
 
     note = f"""# Final frozen-candidate evaluation
 
@@ -445,10 +488,9 @@ result large enough to survive an aggressive quoted-spread cost assumption?
 - Cost assumption: full estimated quoted-spread crossing cost
 
 The candidate and evaluation rules were frozen before this run. The final block
-was not used in Phases A-C to select the LightGBM no-time candidate. However,
-the same block had previously been inspected with exploratory linear baselines,
-so this is a configuration-level holdout rather than a completely untouched
-data set. Truly independent evidence requires additional trading days.
+was not used in Phases A-C to select the LightGBM no-time candidate. The same
+block had previously been inspected with exploratory linear baselines, so this
+is a configuration-level holdout rather than a completely untouched data set.
 
 ## Final classification result
 
@@ -470,7 +512,7 @@ The frozen LightGBM regressor achieved:
 
 ## Final execution result
 
-At the frozen 0.10 confidence threshold:
+At the frozen {configuration["confidence_threshold"]:.2f} confidence threshold:
 
 - Active-signal fraction: {lightgbm_econ["active_signal_fraction"]:.2%}
 - Gross edge per active signal: {lightgbm_econ["mean_gross_return_active_bps"]:.3f} bps
@@ -481,36 +523,37 @@ At the frozen 0.10 confidence threshold:
 
 ## Interpretation
 
-The final result should be interpreted as evidence about short-horizon price
-formation, not as a deployable strategy. A positive rank IC or directional
-accuracy shows that the features contain information. Economic viability
-requires the gross edge to cover execution costs, latency, queue uncertainty,
-fees and model decay.
-
-## Limitations
-
-1. One stock and one trading day cannot establish out-of-day generalisation.
-2. The predictive experiment uses one LOBSTER stock-day. The repository contains a
-   separate independent raw ITCH reconstruction path, but that 2019 reconstruction
-   was not used as an out-of-day evaluation of the frozen prediction model.
-3. The execution model assumes immediate aggressive fills and does not model
-   queue position, partial fills, latency or adverse selection.
-4. The final block was previously viewed for exploratory linear baselines,
-   although not for the frozen LightGBM no-time configuration.
-5. Feature importance is descriptive and is not a causal attribution.
+The result supports short-horizon price predictability within the studied day,
+not a deployable strategy. Economic viability would require the gross edge to
+cover execution costs, latency, queue uncertainty, fees, impact, and model decay.
 
 ## Raw ITCH engineering extension
 
-A separate streaming parser reconstructed 1,656,597 AAPL displayed-book
-transitions from 368,366,634 market-wide Nasdaq ITCH messages. All tracked
-order-reference, quantity, timestamp, aggregation, and crossed-book invariant
-checks passed.
+A separate streaming parser processed 368,366,634 market-wide Nasdaq ITCH
+messages and reconstructed 1,656,597 AAPL displayed-book transitions. All
+tracked order-reference, quantity, timestamp, aggregation, and crossed-book
+integrity checks passed.
+
+This 2019 reconstruction was not used as an out-of-day evaluation of the 2012
+predictive model.
+
+## Limitations
+
+1. One stock and one predictive trading day cannot establish out-of-day
+   generalisation.
+2. The final block is a configuration-level holdout, not an independent day.
+3. The execution model assumes immediate aggressive fills and does not model
+   queue position, partial fills, latency, fees, impact, or adverse selection.
+4. Feature importance is descriptive and is not a causal attribution.
+5. Independent ITCH reconstruction demonstrates engineering correctness, not
+   cross-day predictive stability.
 
 ## Potential extensions
 
-Further research could evaluate additional dates and instruments, probability
-calibration, passive execution assumptions, queue position, latency, partial
-fills, and market impact.
+Additional dates and instruments, probability calibration, passive execution,
+queue position, latency, partial fills, and market impact remain valid future
+research directions. They are not required for the v1.0.0 engineering and
+research release.
 """
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(note, encoding="utf-8")
