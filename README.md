@@ -198,9 +198,19 @@ python -m orderbook_research.train_baseline `
     --levels 10 `
     --horizon 50
 ```
+## Final evaluation figures
+
+### Return-ranking performance
+
 ![Final return-ranking comparison](reports/figures/final/final_rank_ic.png)
 
-![Gross edge versus execution cost](reports/figures/final/final_signal_economics.png)
+### Gross edge versus execution cost
+
+![Gross edge versus estimated execution cost](reports/figures/final/final_signal_economics.png)
+
+### Net result after estimated costs
+
+![Cumulative net result](reports/figures/final/final_cumulative_net.png)
 
 ## Leakage controls
 

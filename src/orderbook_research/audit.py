@@ -34,12 +34,8 @@ def audit_data(
         "rows_loaded": int(len(raw)),
         "time_start_seconds": float(raw["time_seconds"].min()),
         "time_end_seconds": float(raw["time_seconds"].max()),
-        "timestamps_monotonic": bool(
-            raw["time_seconds"].is_monotonic_increasing
-        ),
-        "duplicate_timestamp_fraction": float(
-            raw["time_seconds"].duplicated().mean()
-        ),
+        "timestamps_monotonic": bool(raw["time_seconds"].is_monotonic_increasing),
+        "duplicate_timestamp_fraction": float(raw["time_seconds"].duplicated().mean()),
         "crossed_book_rows": int(crossed.sum()),
         "locked_book_rows": int(locked.sum()),
         "missing_values_total": int(raw.isna().sum().sum()),
@@ -48,12 +44,7 @@ def audit_data(
             for event_type, count in event_counts.items()
         },
         "median_interarrival_microseconds": float(
-            raw["time_seconds"]
-            .diff()
-            .replace(0, np.nan)
-            .dropna()
-            .median()
-            * 1_000_000.0
+            raw["time_seconds"].diff().replace(0, np.nan).dropna().median() * 1_000_000.0
         ),
     }
 

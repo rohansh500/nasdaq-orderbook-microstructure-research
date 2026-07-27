@@ -60,15 +60,11 @@ def test_probability_positions_requires_up_and_down() -> None:
 
 
 def test_normalized_feature_importance_sums_to_one() -> None:
-    result = normalized_feature_importance(
-        ["a", "b", "c"], np.array([2.0, 1.0, 1.0])
-    )
+    result = normalized_feature_importance(["a", "b", "c"], np.array([2.0, 1.0, 1.0]))
     assert sum(result.values()) == pytest.approx(1.0)
     assert result["a"] == pytest.approx(0.5)
 
 
 def test_normalized_feature_importance_handles_zero_gain() -> None:
-    result = normalized_feature_importance(
-        ["a", "b"], np.array([0.0, np.nan])
-    )
+    result = normalized_feature_importance(["a", "b"], np.array([0.0, np.nan]))
     assert result == {"a": 0.0, "b": 0.0}

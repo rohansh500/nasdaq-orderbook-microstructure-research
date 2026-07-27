@@ -47,9 +47,7 @@ def test_bootstrap_is_reproducible_and_returns_intervals():
     assert first.intervals == second.intervals
     assert first.intervals["ridge_rank_ic"]["ci_lower"] > 0
     assert (
-        first.intervals["ridge_nonzero_directional_accuracy"]
-        ["probability_above_benchmark"]
-        > 0.90
+        first.intervals["ridge_nonzero_directional_accuracy"]["probability_above_benchmark"] > 0.90
     )
 
 

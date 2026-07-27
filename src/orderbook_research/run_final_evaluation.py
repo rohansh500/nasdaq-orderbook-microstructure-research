@@ -79,9 +79,7 @@ def run_final_evaluation(
     allow_rerun: bool,
 ) -> dict[str, Any]:
     if horizon != PRIMARY_HORIZON:
-        raise ValueError(
-            f"The frozen Phase D horizon is {PRIMARY_HORIZON} events."
-        )
+        raise ValueError(f"The frozen Phase D horizon is {PRIMARY_HORIZON} events.")
     validate_run_request(
         smoke=smoke,
         confirm_final_holdout=confirm_final_holdout,
@@ -147,20 +145,14 @@ def run_final_evaluation(
         "majority_classifier": detailed_classification_metrics(
             y_holdout_class, majority_prediction
         ),
-        "balanced_logistic": detailed_classification_metrics(
-            y_holdout_class, logistic_prediction
-        ),
+        "balanced_logistic": detailed_classification_metrics(y_holdout_class, logistic_prediction),
         "lightgbm_classifier": detailed_classification_metrics(
             y_holdout_class, lightgbm_class_prediction
         ),
     }
     regression_metrics = {
-        "zero_return": detailed_regression_metrics(
-            holdout[return_target], zero_prediction
-        ),
-        "ridge": detailed_regression_metrics(
-            holdout[return_target], ridge_prediction
-        ),
+        "zero_return": detailed_regression_metrics(holdout[return_target], zero_prediction),
+        "ridge": detailed_regression_metrics(holdout[return_target], ridge_prediction),
         "lightgbm_regressor": detailed_regression_metrics(
             holdout[return_target], lightgbm_return_prediction
         ),
@@ -176,12 +168,8 @@ def run_final_evaluation(
         lightgbm_classifier.predict_proba(x_holdout),
         lightgbm_classifier.classes_,
     )
-    logistic_simulation, logistic_economics = _simulation_metrics(
-        logistic_frame, horizon
-    )
-    lightgbm_simulation, lightgbm_economics = _simulation_metrics(
-        lightgbm_frame, horizon
-    )
+    logistic_simulation, logistic_economics = _simulation_metrics(logistic_frame, horizon)
+    lightgbm_simulation, lightgbm_economics = _simulation_metrics(lightgbm_frame, horizon)
     economics = {
         "balanced_logistic": logistic_economics,
         "lightgbm_classifier": lightgbm_economics,
@@ -192,12 +180,8 @@ def run_final_evaluation(
         {
             "development_rows_after_target_filter": int(len(development)),
             "holdout_rows_after_target_filter": int(len(holdout)),
-            "development_time_start_seconds": float(
-                development["time_seconds"].min()
-            ),
-            "development_time_end_seconds": float(
-                development["time_seconds"].max()
-            ),
+            "development_time_start_seconds": float(development["time_seconds"].min()),
+            "development_time_end_seconds": float(development["time_seconds"].max()),
             "holdout_time_start_seconds": float(holdout["time_seconds"].min()),
             "holdout_time_end_seconds": float(holdout["time_seconds"].max()),
         }
@@ -283,15 +267,9 @@ def run_final_evaluation(
         [{"model": model, **metrics} for model, metrics in economics.items()]
     )
 
-    classification_rows.to_csv(
-        table_directory / "final_holdout_classification.csv", index=False
-    )
-    regression_rows.to_csv(
-        table_directory / "final_holdout_regression.csv", index=False
-    )
-    economics_rows.to_csv(
-        table_directory / "final_holdout_economics.csv", index=False
-    )
+    classification_rows.to_csv(table_directory / "final_holdout_classification.csv", index=False)
+    regression_rows.to_csv(table_directory / "final_holdout_regression.csv", index=False)
+    economics_rows.to_csv(table_directory / "final_holdout_economics.csv", index=False)
     lightgbm_simulation.to_csv(
         table_directory / "final_holdout_lightgbm_simulation.csv", index=False
     )
@@ -305,12 +283,8 @@ def run_final_evaluation(
     regressor_importance = normalized_importance_frame(
         lightgbm_regressor, features, "lightgbm_regressor"
     )
-    importance = pd.concat(
-        [classifier_importance, regressor_importance], ignore_index=True
-    )
-    importance.to_csv(
-        table_directory / "final_holdout_feature_importance.csv", index=False
-    )
+    importance = pd.concat([classifier_importance, regressor_importance], ignore_index=True)
+    importance.to_csv(table_directory / "final_holdout_feature_importance.csv", index=False)
 
     generated_figures = generate_final_figures(
         figure_directory=figure_directory,

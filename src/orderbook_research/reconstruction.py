@@ -110,32 +110,20 @@ def reconstruction_audit(
             int(current_row["direction"]),
         )
 
-        reconstructed_bid_price, reconstructed_bid_size = (
-            book.best_bid()
-        )
-        reconstructed_ask_price, reconstructed_ask_size = (
-            book.best_ask()
-        )
+        reconstructed_bid_price, reconstructed_bid_size = book.best_bid()
+        reconstructed_ask_price, reconstructed_ask_size = book.best_ask()
 
         actual_bid_price = (
-            None
-            if pd.isna(current_row["bid_price_1"])
-            else int(current_row["bid_price_1"])
+            None if pd.isna(current_row["bid_price_1"]) else int(current_row["bid_price_1"])
         )
         actual_ask_price = (
-            None
-            if pd.isna(current_row["ask_price_1"])
-            else int(current_row["ask_price_1"])
+            None if pd.isna(current_row["ask_price_1"]) else int(current_row["ask_price_1"])
         )
         actual_bid_size = (
-            None
-            if pd.isna(current_row["bid_size_1"])
-            else int(current_row["bid_size_1"])
+            None if pd.isna(current_row["bid_size_1"]) else int(current_row["bid_size_1"])
         )
         actual_ask_size = (
-            None
-            if pd.isna(current_row["ask_size_1"])
-            else int(current_row["ask_size_1"])
+            None if pd.isna(current_row["ask_size_1"]) else int(current_row["ask_size_1"])
         )
 
         price_match = (
@@ -159,15 +147,7 @@ def reconstruction_audit(
     return {
         "audit_method": "one_step_reseeded_transition",
         "events_checked": checked,
-        "top_price_match_fraction": (
-            exact_top_price_matches / checked
-            if checked
-            else 0.0
-        ),
-        "top_state_match_fraction": (
-            exact_top_state_matches / checked
-            if checked
-            else 0.0
-        ),
+        "top_price_match_fraction": (exact_top_price_matches / checked if checked else 0.0),
+        "top_state_match_fraction": (exact_top_state_matches / checked if checked else 0.0),
         "first_top_price_mismatch_event": first_price_mismatch,
     }

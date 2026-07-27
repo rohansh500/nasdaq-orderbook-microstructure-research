@@ -18,9 +18,7 @@ def classification_metrics(
 ) -> dict[str, object]:
     return {
         "accuracy": float(accuracy_score(y_true, y_pred)),
-        "balanced_accuracy": float(
-            balanced_accuracy_score(y_true, y_pred)
-        ),
+        "balanced_accuracy": float(balanced_accuracy_score(y_true, y_pred)),
         "macro_f1": float(f1_score(y_true, y_pred, average="macro")),
         "confusion_matrix_labels": [-1, 0, 1],
         "confusion_matrix": confusion_matrix(

@@ -6,7 +6,6 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import BinaryIO, Iterable, Iterator
 
-
 _LENGTH_PREFIX = struct.Struct(">H")
 
 # Payload lengths from Nasdaq TotalView-ITCH 5.0.  Only the message types
@@ -142,8 +141,7 @@ class BinaryFileReader:
                     self.stats.length_mismatches += 1
                     if self.strict_lengths:
                         raise ValueError(
-                            f"Message {kind!r} has length {payload_length}; "
-                            f"expected {expected}."
+                            f"Message {kind!r} has length {payload_length}; expected {expected}."
                         )
 
                 sequence += 1

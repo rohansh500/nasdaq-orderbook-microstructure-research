@@ -23,10 +23,9 @@ def best_quote_order_flow_imbalance(frame: pd.DataFrame) -> pd.Series:
     previous_ask_price = ask_price.shift(1)
     previous_ask_size = ask_size.shift(1)
 
-    bid_contribution = (
-        (bid_price >= previous_bid_price).astype(float) * bid_size
-        - (bid_price <= previous_bid_price).astype(float) * previous_bid_size
-    )
+    bid_contribution = (bid_price >= previous_bid_price).astype(float) * bid_size - (
+        bid_price <= previous_bid_price
+    ).astype(float) * previous_bid_size
     ask_contribution = (
         -(ask_price <= previous_ask_price).astype(float) * ask_size
         + (ask_price >= previous_ask_price).astype(float) * previous_ask_size
@@ -41,13 +40,9 @@ def add_snapshot_features(
 ) -> pd.DataFrame:
     df = frame.copy()
 
-    df["mid_price"] = (
-        df["ask_price_1"] + df["bid_price_1"]
-    ) / 2.0
+    df["mid_price"] = (df["ask_price_1"] + df["bid_price_1"]) / 2.0
     df["spread"] = df["ask_price_1"] - df["bid_price_1"]
-    df["spread_bps"] = (
-        10_000.0 * safe_divide(df["spread"], df["mid_price"])
-    )
+    df["spread_bps"] = 10_000.0 * safe_divide(df["spread"], df["mid_price"])
 
     top_depth = df["bid_size_1"] + df["ask_size_1"]
     df["queue_imbalance_l1"] = safe_divide(
@@ -56,27 +51,17 @@ def add_snapshot_features(
     )
 
     df["microprice"] = safe_divide(
-        (
-            df["ask_price_1"] * df["bid_size_1"]
-            + df["bid_price_1"] * df["ask_size_1"]
-        ),
+        (df["ask_price_1"] * df["bid_size_1"] + df["bid_price_1"] * df["ask_size_1"]),
         top_depth,
     )
-    df["microprice_deviation_bps"] = (
-        10_000.0
-        * safe_divide(
-            df["microprice"] - df["mid_price"],
-            df["mid_price"],
-        )
+    df["microprice_deviation_bps"] = 10_000.0 * safe_divide(
+        df["microprice"] - df["mid_price"],
+        df["mid_price"],
     )
 
     for depth in sorted({1, min(5, levels), levels}):
-        bid_columns = [
-            f"bid_size_{level}" for level in range(1, depth + 1)
-        ]
-        ask_columns = [
-            f"ask_size_{level}" for level in range(1, depth + 1)
-        ]
+        bid_columns = [f"bid_size_{level}" for level in range(1, depth + 1)]
+        ask_columns = [f"ask_size_{level}" for level in range(1, depth + 1)]
 
         bid_depth = df[bid_columns].sum(axis=1, min_count=1)
         ask_depth = df[ask_columns].sum(axis=1, min_count=1)
@@ -91,9 +76,7 @@ def add_snapshot_features(
         )
 
     df["ofi_l1"] = best_quote_order_flow_imbalance(df)
-    df["event_interarrival_us"] = (
-        df["time_seconds"].diff().clip(lower=0) * 1_000_000.0
-    )
+    df["event_interarrival_us"] = df["time_seconds"].diff().clip(lower=0) * 1_000_000.0
 
     df["is_submission"] = (df["event_type"] == 1).astype("int8")
     df["is_partial_cancel"] = (df["event_type"] == 2).astype("int8")
@@ -137,30 +120,34 @@ def add_snapshot_features(
             df["ofi_l1"].rolling(window, min_periods=max(2, window // 4)).sum()
         )
         df[f"add_pressure_{window}"] = safe_divide(
-            df["signed_add_event"].rolling(
+            df["signed_add_event"]
+            .rolling(
                 window,
                 min_periods=max(2, window // 4),
-            ).sum(),
+            )
+            .sum(),
             normaliser,
         )
         df[f"cancel_pressure_{window}"] = safe_divide(
-            df["signed_cancel_event"].rolling(
+            df["signed_cancel_event"]
+            .rolling(
                 window,
                 min_periods=max(2, window // 4),
-            ).sum(),
+            )
+            .sum(),
             normaliser,
         )
         df[f"trade_pressure_{window}"] = safe_divide(
-            df["signed_trade_event"].rolling(
+            df["signed_trade_event"]
+            .rolling(
                 window,
                 min_periods=max(2, window // 4),
-            ).sum(),
+            )
+            .sum(),
             normaliser,
         )
         df[f"rolling_volatility_{window}"] = (
-            df["mid_log_return"]
-            .rolling(window, min_periods=max(2, window // 4))
-            .std()
+            df["mid_log_return"].rolling(window, min_periods=max(2, window // 4)).std()
         )
 
     df.replace([np.inf, -np.inf], np.nan, inplace=True)

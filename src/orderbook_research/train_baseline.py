@@ -29,7 +29,6 @@ from orderbook_research.simulation import non_overlapping_signal_simulation
 from orderbook_research.splits import purged_chronological_split
 from orderbook_research.targets import add_event_horizon_targets
 
-
 CLASS_LABELS = (-1, 0, 1)
 CLASS_NAMES = {
     -1: "down",
@@ -43,21 +42,13 @@ def class_distribution(target: pd.Series) -> dict[str, object]:
     counts = target.value_counts().reindex(CLASS_LABELS, fill_value=0)
     total = int(counts.sum())
 
-    proportions = (
-        counts / total
-        if total > 0
-        else pd.Series(0.0, index=counts.index)
-    )
+    proportions = counts / total if total > 0 else pd.Series(0.0, index=counts.index)
 
     return {
         "labels": list(CLASS_LABELS),
-        "counts": {
-            CLASS_NAMES[label]: int(counts.loc[label])
-            for label in CLASS_LABELS
-        },
+        "counts": {CLASS_NAMES[label]: int(counts.loc[label]) for label in CLASS_LABELS},
         "proportions": {
-            CLASS_NAMES[label]: float(proportions.loc[label])
-            for label in CLASS_LABELS
+            CLASS_NAMES[label]: float(proportions.loc[label]) for label in CLASS_LABELS
         },
     }
 
@@ -113,18 +104,11 @@ def detailed_regression_metrics(
         rank_value = spearmanr(actual, predicted).statistic
         rank_ic = float(rank_value) if np.isfinite(rank_value) else 0.0
 
-    directional_accuracy = float(
-        np.mean(np.sign(actual) == np.sign(predicted))
-    )
+    directional_accuracy = float(np.mean(np.sign(actual) == np.sign(predicted)))
 
     nonzero_mask = actual != 0.0
     nonzero_directional_accuracy = (
-        float(
-            np.mean(
-                np.sign(actual[nonzero_mask])
-                == np.sign(predicted[nonzero_mask])
-            )
-        )
+        float(np.mean(np.sign(actual[nonzero_mask]) == np.sign(predicted[nonzero_mask])))
         if nonzero_mask.any()
         else 0.0
     )
@@ -164,30 +148,20 @@ def detailed_simulation_metrics(
             "estimated_total_cost_bps": cost_total,
             "net_return_bps": net_total,
             "mean_gross_return_active_bps": (
-                float(
-                    simulation.loc[active, "gross_return_bps"].mean()
-                )
+                float(simulation.loc[active, "gross_return_bps"].mean())
                 if active_count > 0
                 else 0.0
             ),
             "mean_estimated_cost_active_bps": (
-                float(
-                    simulation.loc[active, "estimated_cost_bps"].mean()
-                )
+                float(simulation.loc[active, "estimated_cost_bps"].mean())
                 if active_count > 0
                 else 0.0
             ),
             "mean_net_return_active_bps": (
-                float(
-                    simulation.loc[active, "net_return_bps"].mean()
-                )
-                if active_count > 0
-                else 0.0
+                float(simulation.loc[active, "net_return_bps"].mean()) if active_count > 0 else 0.0
             ),
             "break_even_cost_fraction": (
-                float(gross_total / cost_total)
-                if cost_total > 0
-                else 0.0
+                float(gross_total / cost_total) if cost_total > 0 else 0.0
             ),
         }
     )
@@ -228,9 +202,7 @@ def train_baselines(
 
     train = train.dropna(subset=[class_target, return_target])
     validation = validation.dropna(subset=[class_target, return_target])
-    exploratory_holdout = exploratory_holdout.dropna(
-        subset=[class_target, return_target]
-    )
+    exploratory_holdout = exploratory_holdout.dropna(subset=[class_target, return_target])
 
     x_train = train[feature_columns]
     x_validation = validation[feature_columns]
@@ -288,43 +260,28 @@ def train_baselines(
     fitted_classes = balanced_logistic.named_steps["model"].classes_
 
     probability_columns = {
-        int(class_label): position
-        for position, class_label in enumerate(fitted_classes)
+        int(class_label): position for position, class_label in enumerate(fitted_classes)
     }
     required_probability_classes = {-1, 1}
-    missing_probability_classes = (
-        required_probability_classes - set(probability_columns)
-    )
+    missing_probability_classes = required_probability_classes - set(probability_columns)
     if missing_probability_classes:
         raise ValueError(
             "The fitted classifier is missing required classes: "
             f"{sorted(missing_probability_classes)}"
         )
 
-    validation["probability_down"] = validation_probabilities[
-        :, probability_columns[-1]
-    ]
-    validation["probability_up"] = validation_probabilities[
-        :, probability_columns[1]
-    ]
-    exploratory_holdout["probability_down"] = holdout_probabilities[
-        :, probability_columns[-1]
-    ]
-    exploratory_holdout["probability_up"] = holdout_probabilities[
-        :, probability_columns[1]
-    ]
+    validation["probability_down"] = validation_probabilities[:, probability_columns[-1]]
+    validation["probability_up"] = validation_probabilities[:, probability_columns[1]]
+    exploratory_holdout["probability_down"] = holdout_probabilities[:, probability_columns[-1]]
+    exploratory_holdout["probability_up"] = holdout_probabilities[:, probability_columns[1]]
 
-    validation_simulation, validation_base_simulation_stats = (
-        non_overlapping_signal_simulation(
-            validation,
-            horizon=horizon,
-        )
+    validation_simulation, validation_base_simulation_stats = non_overlapping_signal_simulation(
+        validation,
+        horizon=horizon,
     )
-    holdout_simulation, holdout_base_simulation_stats = (
-        non_overlapping_signal_simulation(
-            exploratory_holdout,
-            horizon=horizon,
-        )
+    holdout_simulation, holdout_base_simulation_stats = non_overlapping_signal_simulation(
+        exploratory_holdout,
+        horizon=horizon,
     )
 
     validation_simulation_stats = detailed_simulation_metrics(
@@ -351,10 +308,7 @@ def train_baselines(
             "validation_rows": len(validation),
             "exploratory_holdout_rows": len(exploratory_holdout),
             "purge_events": split.purge_events,
-            "split_design": (
-                "purged_chronological_train_validation_"
-                "exploratory_holdout"
-            ),
+            "split_design": ("purged_chronological_train_validation_exploratory_holdout"),
             "logistic_parameters": {
                 "C": 0.10,
                 "max_iter": 500,
@@ -443,8 +397,7 @@ def train_baselines(
         index=False,
     )
     holdout_simulation.to_parquet(
-        output_directory
-        / f"exploratory_holdout_h{horizon}_simulation.parquet",
+        output_directory / f"exploratory_holdout_h{horizon}_simulation.parquet",
         index=False,
     )
 
@@ -454,8 +407,7 @@ def train_baselines(
 def main() -> None:
     parser = argparse.ArgumentParser(
         description=(
-            "Train leakage-safe majority, balanced logistic, zero-return, "
-            "and Ridge baselines."
+            "Train leakage-safe majority, balanced logistic, zero-return, and Ridge baselines."
         )
     )
     parser.add_argument("--ticker", default="AAPL")

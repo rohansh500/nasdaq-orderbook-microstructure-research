@@ -30,7 +30,6 @@ from orderbook_research.train_baseline import (
 )
 from orderbook_research.walk_forward import ExpandingWindowFold, expanding_window_folds
 
-
 SCHEMA_VERSION = "0.7.0"
 PRIMARY_HORIZON = 50
 DEFAULT_CONFIDENCE_THRESHOLD = 0.10
@@ -146,9 +145,7 @@ def _comparison_fold(
     ridge_prediction = ridge.predict(x_validation)
     lightgbm_return_prediction = lightgbm_regressor.predict(x_validation)
 
-    logistic_metrics = detailed_classification_metrics(
-        y_validation_class, logistic_prediction
-    )
+    logistic_metrics = detailed_classification_metrics(y_validation_class, logistic_prediction)
     lightgbm_classifier_metrics = detailed_classification_metrics(
         y_validation_class, lightgbm_class_prediction
     )
@@ -176,12 +173,8 @@ def _comparison_fold(
             "validation_rows_after_target_filter": int(len(validation)),
             "train_time_start_seconds": float(train["time_seconds"].min()),
             "train_time_end_seconds": float(train["time_seconds"].max()),
-            "validation_time_start_seconds": float(
-                validation["time_seconds"].min()
-            ),
-            "validation_time_end_seconds": float(
-                validation["time_seconds"].max()
-            ),
+            "validation_time_start_seconds": float(validation["time_seconds"].min()),
+            "validation_time_end_seconds": float(validation["time_seconds"].max()),
         }
     )
 
@@ -189,18 +182,14 @@ def _comparison_fold(
         "horizon": horizon,
         **metadata,
         "logistic_balanced_accuracy": logistic_metrics["balanced_accuracy"],
-        "lightgbm_balanced_accuracy": lightgbm_classifier_metrics[
-            "balanced_accuracy"
-        ],
+        "lightgbm_balanced_accuracy": lightgbm_classifier_metrics["balanced_accuracy"],
         "lightgbm_balanced_accuracy_delta": (
-            lightgbm_classifier_metrics["balanced_accuracy"]
-            - logistic_metrics["balanced_accuracy"]
+            lightgbm_classifier_metrics["balanced_accuracy"] - logistic_metrics["balanced_accuracy"]
         ),
         "logistic_macro_f1": logistic_metrics["macro_f1"],
         "lightgbm_macro_f1": lightgbm_classifier_metrics["macro_f1"],
         "lightgbm_macro_f1_delta": (
-            lightgbm_classifier_metrics["macro_f1"]
-            - logistic_metrics["macro_f1"]
+            lightgbm_classifier_metrics["macro_f1"] - logistic_metrics["macro_f1"]
         ),
         "zero_mae_bps": zero_metrics["mae_bps"],
         "ridge_mae_bps": ridge_metrics["mae_bps"],
@@ -221,36 +210,18 @@ def _comparison_fold(
         "lightgbm_rank_ic_delta": (
             lightgbm_regressor_metrics["rank_ic"] - ridge_metrics["rank_ic"]
         ),
-        "ridge_nonzero_directional_accuracy": ridge_metrics[
-            "nonzero_directional_accuracy"
-        ],
+        "ridge_nonzero_directional_accuracy": ridge_metrics["nonzero_directional_accuracy"],
         "lightgbm_nonzero_directional_accuracy": lightgbm_regressor_metrics[
             "nonzero_directional_accuracy"
         ],
-        "logistic_active_signal_fraction": logistic_economics[
-            "active_signal_fraction"
-        ],
-        "lightgbm_active_signal_fraction": lightgbm_economics[
-            "active_signal_fraction"
-        ],
-        "logistic_mean_gross_active_bps": logistic_economics[
-            "mean_gross_return_active_bps"
-        ],
-        "lightgbm_mean_gross_active_bps": lightgbm_economics[
-            "mean_gross_return_active_bps"
-        ],
-        "logistic_mean_net_active_bps": logistic_economics[
-            "mean_net_return_active_bps"
-        ],
-        "lightgbm_mean_net_active_bps": lightgbm_economics[
-            "mean_net_return_active_bps"
-        ],
-        "logistic_break_even_cost_fraction": logistic_economics[
-            "break_even_cost_fraction"
-        ],
-        "lightgbm_break_even_cost_fraction": lightgbm_economics[
-            "break_even_cost_fraction"
-        ],
+        "logistic_active_signal_fraction": logistic_economics["active_signal_fraction"],
+        "lightgbm_active_signal_fraction": lightgbm_economics["active_signal_fraction"],
+        "logistic_mean_gross_active_bps": logistic_economics["mean_gross_return_active_bps"],
+        "lightgbm_mean_gross_active_bps": lightgbm_economics["mean_gross_return_active_bps"],
+        "logistic_mean_net_active_bps": logistic_economics["mean_net_return_active_bps"],
+        "lightgbm_mean_net_active_bps": lightgbm_economics["mean_net_return_active_bps"],
+        "logistic_break_even_cost_fraction": logistic_economics["break_even_cost_fraction"],
+        "lightgbm_break_even_cost_fraction": lightgbm_economics["break_even_cost_fraction"],
     }
 
     details = {
@@ -321,14 +292,10 @@ def _ablation_fold(
     zero_metrics = detailed_regression_metrics(
         validation[return_target], np.zeros(len(validation), dtype=float)
     )
-    regression_metrics = detailed_regression_metrics(
-        validation[return_target], return_prediction
-    )
+    regression_metrics = detailed_regression_metrics(validation[return_target], return_prediction)
 
     probabilities = classifier.predict_proba(validation[feature_columns])
-    economic_frame = _attach_probabilities(
-        validation, probabilities, classifier.classes_
-    )
+    economic_frame = _attach_probabilities(validation, probabilities, classifier.classes_)
     economics = _simulation_metrics(economic_frame, horizon)
 
     row = {
@@ -343,13 +310,9 @@ def _ablation_fold(
             zero_metrics["mae_bps"], regression_metrics["mae_bps"]
         ),
         "rank_ic": regression_metrics["rank_ic"],
-        "nonzero_directional_accuracy": regression_metrics[
-            "nonzero_directional_accuracy"
-        ],
+        "nonzero_directional_accuracy": regression_metrics["nonzero_directional_accuracy"],
         "active_signal_fraction": economics["active_signal_fraction"],
-        "mean_gross_return_active_bps": economics[
-            "mean_gross_return_active_bps"
-        ],
+        "mean_gross_return_active_bps": economics["mean_gross_return_active_bps"],
         "mean_net_return_active_bps": economics["mean_net_return_active_bps"],
         "break_even_cost_fraction": economics["break_even_cost_fraction"],
     }
@@ -390,11 +353,12 @@ def _aggregate(frame: pd.DataFrame, groups: list[str]) -> pd.DataFrame:
         if column in frame.columns
     ]
     if positive_columns:
-        counts = frame.assign(
-            **{f"{column}_positive": frame[column] > 0 for column in positive_columns}
-        ).groupby(groups, dropna=False)[
-            [f"{column}_positive" for column in positive_columns]
-        ].sum().reset_index()
+        counts = (
+            frame.assign(**{f"{column}_positive": frame[column] > 0 for column in positive_columns})
+            .groupby(groups, dropna=False)[[f"{column}_positive" for column in positive_columns]]
+            .sum()
+            .reset_index()
+        )
         result = result.merge(counts, on=groups, how="left")
     return result
 
@@ -425,25 +389,19 @@ def _write_cross_horizon_summary(output_directory: Path) -> None:
             ]
             .agg(["mean", "std", "min", "max"])
             .reset_index()
-            .sort_values(
-                ["horizon", "model", "mean"], ascending=[True, True, False]
-            )
+            .sort_values(["horizon", "model", "mean"], ascending=[True, True, False])
         )
         importance_summary.to_csv(
             output_directory / "phase_c_feature_importance_summary.csv",
             index=False,
         )
-        payload["feature_importance_summary"] = importance_summary.to_dict(
-            orient="records"
-        )
+        payload["feature_importance_summary"] = importance_summary.to_dict(orient="records")
 
     ablation_path = output_directory / "phase_c_h50_ablation.csv"
     if ablation_path.exists():
         ablation = pd.read_csv(ablation_path)
         ablation_summary = _aggregate(ablation, ["feature_set"])
-        ablation_summary.to_csv(
-            output_directory / "phase_c_ablation_summary.csv", index=False
-        )
+        ablation_summary.to_csv(output_directory / "phase_c_ablation_summary.csv", index=False)
         payload["ablation_summary"] = ablation_summary.to_dict(orient="records")
 
     if len(payload) > 1:
@@ -548,16 +506,13 @@ def run_model_comparison(
 
     if run_ablation:
         if horizon != PRIMARY_HORIZON:
-            raise ValueError(
-                f"Feature-family ablation is restricted to {PRIMARY_HORIZON} events."
-            )
+            raise ValueError(f"Feature-family ablation is restricted to {PRIMARY_HORIZON} events.")
         ablation_rows: list[dict[str, Any]] = []
         ablation_details: list[dict[str, Any]] = []
         for feature_set in ablation_feature_sets(levels=levels):
             for fold in folds:
                 print(
-                    f"Horizon {horizon}: {feature_set.name} ablation "
-                    f"fold {fold.fold}/{len(folds)}"
+                    f"Horizon {horizon}: {feature_set.name} ablation fold {fold.fold}/{len(folds)}"
                 )
                 row, details = _ablation_fold(
                     data=data,
@@ -574,8 +529,7 @@ def run_model_comparison(
             output_directory / "phase_c_h50_ablation.csv", index=False
         )
         result["ablation_feature_sets"] = [
-            feature_set.as_dict()
-            for feature_set in ablation_feature_sets(levels=levels)
+            feature_set.as_dict() for feature_set in ablation_feature_sets(levels=levels)
         ]
         result["ablation_folds"] = ablation_details
 
@@ -600,9 +554,7 @@ def main() -> None:
     parser.add_argument("--purge-events", type=int, default=100)
     parser.add_argument("--max-rows", type=int, default=None)
     parser.add_argument("--run-ablation", action="store_true")
-    parser.add_argument(
-        "--output-directory", type=Path, default=Path("reports/tables")
-    )
+    parser.add_argument("--output-directory", type=Path, default=Path("reports/tables"))
     args = parser.parse_args()
 
     result = run_model_comparison(

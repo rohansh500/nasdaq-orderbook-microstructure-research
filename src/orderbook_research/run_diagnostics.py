@@ -27,7 +27,6 @@ from orderbook_research.io import load_lobster_pair
 from orderbook_research.targets import add_event_horizon_targets
 from orderbook_research.walk_forward import expanding_window_folds
 
-
 MARKET_ACF_LAGS = (1, 5, 10, 20, 50, 100)
 RESIDUAL_ACF_LAGS = (1, 2, 5, 10, 20)
 LJUNG_BOX_LAGS = (5, 10, 20)
@@ -94,9 +93,7 @@ def _evaluate_fold(
     ridge.fit(train[feature_columns], train[return_target])
     predicted = ridge.predict(validation[feature_columns])
     validation["predicted_return_bps"] = predicted
-    validation["residual_bps"] = (
-        validation[return_target].to_numpy(dtype=float) - predicted
-    )
+    validation["residual_bps"] = validation[return_target].to_numpy(dtype=float) - predicted
     validation["fold"] = fold.fold
 
     diagnostics = descriptive_residual_metrics(
@@ -150,12 +147,8 @@ def _evaluate_fold(
             "validation_rows_after_target_filter": int(len(validation)),
             "train_time_start_seconds": float(train["time_seconds"].min()),
             "train_time_end_seconds": float(train["time_seconds"].max()),
-            "validation_time_start_seconds": float(
-                validation["time_seconds"].min()
-            ),
-            "validation_time_end_seconds": float(
-                validation["time_seconds"].max()
-            ),
+            "validation_time_start_seconds": float(validation["time_seconds"].min()),
+            "validation_time_end_seconds": float(validation["time_seconds"].max()),
         }
     )
 
@@ -163,9 +156,7 @@ def _evaluate_fold(
         "horizon": horizon,
         **metadata,
         **diagnostics,
-        "non_overlapping_residual_observations": int(
-            len(non_overlap_residual)
-        ),
+        "non_overlapping_residual_observations": int(len(non_overlap_residual)),
     }
     for lag in market_acf_lags:
         fold_row[f"mid_return_acf_lag_{lag}"] = _acf_lookup(
@@ -201,9 +192,7 @@ def _evaluate_fold(
     details = {
         "fold_metadata": metadata,
         "regression_and_residual_diagnostics": diagnostics,
-        "non_overlapping_residual_observations": int(
-            len(non_overlap_residual)
-        ),
+        "non_overlapping_residual_observations": int(len(non_overlap_residual)),
         "autocorrelation": autocorrelation.to_dict(orient="records"),
         "ljung_box": ljung_box.to_dict(orient="records"),
     }
@@ -241,39 +230,19 @@ def _cross_horizon_summary(output_directory: Path) -> None:
             "horizon": horizon,
             "folds": int(len(folds)),
             "mean_rank_ic": float(folds["rank_ic"].mean()),
-            "mean_mae_improvement_pct": float(
-                folds["mae_improvement_pct"].mean()
-            ),
-            "mae_improvement_positive_folds": int(
-                (folds["mae_improvement_pct"] > 0.0).sum()
-            ),
+            "mean_mae_improvement_pct": float(folds["mae_improvement_pct"].mean()),
+            "mae_improvement_positive_folds": int((folds["mae_improvement_pct"] > 0.0).sum()),
             "mean_nonzero_directional_accuracy": float(
                 folds["nonzero_directional_accuracy"].mean()
             ),
-            "mean_calibration_slope": float(
-                folds["calibration_slope"].mean()
-            ),
-            "mean_calibration_intercept_bps": float(
-                folds["calibration_intercept_bps"].mean()
-            ),
-            "mean_residual_mean_bps": float(
-                folds["residual_mean_bps"].mean()
-            ),
-            "mean_residual_std_bps": float(
-                folds["residual_std_bps"].mean()
-            ),
-            "mean_residual_acf_lag_1": float(
-                folds["residual_acf_lag_1"].mean()
-            ),
-            "mean_absolute_residual_acf_lag_1": float(
-                folds["residual_acf_lag_1"].abs().mean()
-            ),
-            "residual_ljung_box_20_rejections_5pct": int(
-                folds["ljung_box_reject_5pct_20"].sum()
-            ),
-            "mean_mid_return_acf_lag_1": float(
-                folds["mid_return_acf_lag_1"].mean()
-            ),
+            "mean_calibration_slope": float(folds["calibration_slope"].mean()),
+            "mean_calibration_intercept_bps": float(folds["calibration_intercept_bps"].mean()),
+            "mean_residual_mean_bps": float(folds["residual_mean_bps"].mean()),
+            "mean_residual_std_bps": float(folds["residual_std_bps"].mean()),
+            "mean_residual_acf_lag_1": float(folds["residual_acf_lag_1"].mean()),
+            "mean_absolute_residual_acf_lag_1": float(folds["residual_acf_lag_1"].abs().mean()),
+            "residual_ljung_box_20_rejections_5pct": int(folds["ljung_box_reject_5pct_20"].sum()),
+            "mean_mid_return_acf_lag_1": float(folds["mid_return_acf_lag_1"].mean()),
             "mean_squared_mid_return_acf_lag_1": float(
                 folds["squared_mid_return_acf_lag_1"].mean()
             ),
@@ -283,9 +252,7 @@ def _cross_horizon_summary(output_directory: Path) -> None:
             )
             if len(time_buckets)
             else 0,
-            "time_buckets_positive_rank_ic": int(
-                (time_buckets["rank_ic"] > 0.0).sum()
-            )
+            "time_buckets_positive_rank_ic": int((time_buckets["rank_ic"] > 0.0).sum())
             if len(time_buckets)
             else 0,
         }
@@ -347,20 +314,16 @@ def run_diagnostics(
     oos_frames: list[pd.DataFrame] = []
 
     for fold in folds:
-        print(
-            f"Horizon {horizon}: diagnostics fold {fold.fold}/{len(folds)}"
-        )
-        row, details, autocorrelation, ljung_box, oos_predictions = (
-            _evaluate_fold(
-                data=data,
-                fold=fold,
-                feature_columns=feature_columns,
-                return_target=return_target,
-                horizon=horizon,
-                market_acf_lags=market_acf_lags,
-                residual_acf_lags=residual_acf_lags,
-                ljung_box_lags=ljung_box_lags,
-            )
+        print(f"Horizon {horizon}: diagnostics fold {fold.fold}/{len(folds)}")
+        row, details, autocorrelation, ljung_box, oos_predictions = _evaluate_fold(
+            data=data,
+            fold=fold,
+            feature_columns=feature_columns,
+            return_target=return_target,
+            horizon=horizon,
+            market_acf_lags=market_acf_lags,
+            residual_acf_lags=residual_acf_lags,
+            ljung_box_lags=ljung_box_lags,
         )
         fold_rows.append(row)
         fold_details.append(details)
@@ -374,9 +337,7 @@ def run_diagnostics(
         ignore_index=True,
     )
     ljung_box_frame = pd.concat(ljung_box_frames, ignore_index=True)
-    oos_frame = pd.concat(oos_frames, ignore_index=True).sort_values(
-        "time_seconds"
-    )
+    oos_frame = pd.concat(oos_frames, ignore_index=True).sort_values("time_seconds")
     time_bucket_frame = time_bucket_diagnostics(
         oos_frame,
         actual_column=return_target,
@@ -402,8 +363,7 @@ def run_diagnostics(
             "residual_acf_lags": list(residual_acf_lags),
             "ljung_box_lags": list(ljung_box_lags),
             "residual_sampling": (
-                "every horizon-th validation observation to remove mechanical "
-                "target overlap"
+                "every horizon-th validation observation to remove mechanical target overlap"
             ),
             "time_bucket_minutes": bucket_minutes,
             "minimum_bucket_observations": minimum_bucket_observations,

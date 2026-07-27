@@ -61,12 +61,8 @@ def main() -> None:
         purge_events=100,
     )
 
-    train = data.loc[split.train_indices].dropna(
-        subset=[f"future_move_{horizon}"]
-    )
-    validation = data.loc[split.validation_indices].dropna(
-        subset=[f"future_move_{horizon}"]
-    )
+    train = data.loc[split.train_indices].dropna(subset=[f"future_move_{horizon}"])
+    validation = data.loc[split.validation_indices].dropna(subset=[f"future_move_{horizon}"])
 
     model = Pipeline(
         [

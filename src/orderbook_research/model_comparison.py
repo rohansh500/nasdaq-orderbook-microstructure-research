@@ -8,7 +8,6 @@ from lightgbm import LGBMClassifier, LGBMRegressor
 
 from orderbook_research.features import default_feature_columns
 
-
 FEATURE_FAMILIES = ("book_state", "event_flow", "volatility", "time")
 
 
@@ -84,9 +83,7 @@ def validate_feature_families(
     levels: int = 10,
 ) -> None:
     if tuple(families) != FEATURE_FAMILIES:
-        raise ValueError(
-            f"Feature families must be ordered as {FEATURE_FAMILIES}."
-        )
+        raise ValueError(f"Feature families must be ordered as {FEATURE_FAMILIES}.")
 
     flattened = [column for columns in families.values() for column in columns]
     if len(flattened) != len(set(flattened)):
@@ -175,9 +172,7 @@ def probability_positions(classes: Iterable[int]) -> dict[int, int]:
     result = {int(label): position for position, label in enumerate(classes)}
     missing = {-1, 1} - set(result)
     if missing:
-        raise ValueError(
-            f"Classifier probabilities are missing classes {sorted(missing)}."
-        )
+        raise ValueError(f"Classifier probabilities are missing classes {sorted(missing)}.")
     return result
 
 
@@ -193,6 +188,5 @@ def normalized_feature_importance(
     if total > 0:
         values = values / total
     return {
-        str(feature): float(value)
-        for feature, value in zip(feature_names, values, strict=True)
+        str(feature): float(value) for feature, value in zip(feature_names, values, strict=True)
     }

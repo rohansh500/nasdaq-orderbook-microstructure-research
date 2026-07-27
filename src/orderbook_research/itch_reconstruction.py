@@ -8,11 +8,11 @@ from pathlib import Path
 from typing import Any
 
 import pandas as pd
+
 from orderbook_research.features import default_feature_columns
 from orderbook_research.itch_binary import BinaryFileReader
 from orderbook_research.itch_features import add_itch_snapshot_features
 from orderbook_research.itch_orderbook import ItchSymbolReconstructor
-
 
 SCHEMA_VERSION = "0.9.0"
 
@@ -75,9 +75,7 @@ class ParquetBatchWriter:
         }
 
         if not level_numbers:
-            raise ValueError(
-                "No order-book level columns were found in the first batch."
-            )
+            raise ValueError("No order-book level columns were found in the first batch.")
 
         levels = max(level_numbers)
 
@@ -315,9 +313,7 @@ def reconstruct_itch_file(
         "benchmark": {
             "elapsed_seconds": elapsed,
             "records_per_second": records / elapsed if elapsed else 0.0,
-            "target_book_events_per_second": (
-                target_events / elapsed if elapsed else 0.0
-            ),
+            "target_book_events_per_second": (target_events / elapsed if elapsed else 0.0),
             "compressed_input_megabytes_per_second": (
                 input_size / 1_000_000.0 / elapsed if elapsed else 0.0
             ),

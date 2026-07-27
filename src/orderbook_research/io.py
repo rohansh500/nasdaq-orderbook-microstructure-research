@@ -43,9 +43,7 @@ def expected_paths(
 
 def read_message_file(path: Path, nrows: int | None = None) -> pd.DataFrame:
     if not path.exists():
-        raise FileNotFoundError(
-            f"Message file not found: {path}. Run the download script first."
-        )
+        raise FileNotFoundError(f"Message file not found: {path}. Run the download script first.")
 
     return pd.read_csv(
         path,
@@ -111,8 +109,7 @@ def load_lobster_pair(
 
     if len(messages) != len(orderbook):
         raise ValueError(
-            "Message and order-book row counts differ: "
-            f"{len(messages)} versus {len(orderbook)}."
+            f"Message and order-book row counts differ: {len(messages)} versus {len(orderbook)}."
         )
 
     df = pd.concat(
@@ -130,9 +127,7 @@ def load_lobster_pair(
 
     if scale_prices:
         price_columns = ["price"] + [
-            column
-            for column in orderbook_columns(levels)
-            if "price" in column
+            column for column in orderbook_columns(levels) if "price" in column
         ]
         df[price_columns] = df[price_columns] / PRICE_SCALE
 

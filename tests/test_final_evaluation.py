@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import numpy as np
 import pytest
 
@@ -36,15 +34,8 @@ def test_final_holdout_split_is_chronological_and_purged() -> None:
     assert split.development_indices[-1] == 319_899
     assert split.holdout_indices[0] == 320_000
     assert split.holdout_indices[-1] == 399_999
-    assert (
-        split.holdout_indices.min()
-        - split.development_indices.max()
-        - 1
-        == 100
-    )
-    assert np.intersect1d(
-        split.development_indices, split.holdout_indices
-    ).size == 0
+    assert split.holdout_indices.min() - split.development_indices.max() - 1 == 100
+    assert np.intersect1d(split.development_indices, split.holdout_indices).size == 0
 
 
 def test_final_holdout_split_uses_horizon_as_minimum_purge() -> None:

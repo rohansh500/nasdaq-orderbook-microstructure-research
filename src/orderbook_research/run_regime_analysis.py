@@ -26,7 +26,6 @@ from orderbook_research.targets import add_event_horizon_targets
 from orderbook_research.train_baseline import detailed_regression_metrics
 from orderbook_research.walk_forward import expanding_window_folds
 
-
 REGIME_COLUMNS = {
     "spread": "spread_regime",
     "depth": "depth_regime",
@@ -90,9 +89,7 @@ def _regression_row(
         ),
         "ridge_rmse_bps": float(ridge["rmse_bps"]),
         "ridge_rank_ic": float(ridge["rank_ic"]),
-        "ridge_nonzero_directional_accuracy": float(
-            ridge["nonzero_directional_accuracy"]
-        ),
+        "ridge_nonzero_directional_accuracy": float(ridge["nonzero_directional_accuracy"]),
     }
 
 
@@ -118,9 +115,7 @@ def _aggregate_group(frame: pd.DataFrame, group_columns: list[str]) -> pd.DataFr
         "break_even_cost_fraction",
     ]
     aggregations: dict[str, list[str]] = {
-        metric: ["mean", "std", "min", "max"]
-        for metric in metrics
-        if metric in frame.columns
+        metric: ["mean", "std", "min", "max"] for metric in metrics if metric in frame.columns
     }
     summary = frame.groupby(group_columns, dropna=False).agg(aggregations)
     summary.columns = [f"{metric}_{stat}" for metric, stat in summary.columns]
@@ -132,9 +127,7 @@ def _aggregate_group(frame: pd.DataFrame, group_columns: list[str]) -> pd.DataFr
                 positive_net_fold=frame["mean_net_return_active_bps"] > 0,
                 positive_gross_fold=frame["mean_gross_return_active_bps"] > 0,
             )
-            .groupby(group_columns, dropna=False)[
-                ["positive_net_fold", "positive_gross_fold"]
-            ]
+            .groupby(group_columns, dropna=False)[["positive_net_fold", "positive_gross_fold"]]
             .sum()
             .reset_index()
         )
@@ -182,9 +175,7 @@ def _cross_horizon_summary(output_directory: Path) -> None:
             output_directory / "phase_b_sensitivity_summary.csv",
             index=False,
         )
-        payload["sensitivity_summary"] = sensitivity_summary.to_dict(
-            orient="records"
-        )
+        payload["sensitivity_summary"] = sensitivity_summary.to_dict(orient="records")
 
     if intersection_frames:
         intersections = pd.concat(intersection_frames, ignore_index=True)
@@ -196,9 +187,7 @@ def _cross_horizon_summary(output_directory: Path) -> None:
             output_directory / "phase_b_spread_confidence_summary.csv",
             index=False,
         )
-        payload["spread_confidence_summary"] = intersection_summary.to_dict(
-            orient="records"
-        )
+        payload["spread_confidence_summary"] = intersection_summary.to_dict(orient="records")
 
     if len(payload) > 1:
         (output_directory / "phase_b_summary_metrics.json").write_text(
@@ -239,9 +228,7 @@ def _evaluate_fold(
 
     validation["probability_down"] = probabilities[:, positions[-1]]
     validation["probability_up"] = probabilities[:, positions[1]]
-    validation["predicted_return_bps"] = ridge.predict(
-        validation[feature_columns]
-    )
+    validation["predicted_return_bps"] = ridge.predict(validation[feature_columns])
     validation, regime_metadata = add_validation_regimes(
         train=train,
         validation=validation,
@@ -254,9 +241,7 @@ def _evaluate_fold(
     regime_rows: list[dict[str, Any]] = []
     for regime_type, regime_column in REGIME_COLUMNS.items():
         labels = sorted(
-            label
-            for label in validation[regime_column].dropna().unique()
-            if label != "unknown"
+            label for label in validation[regime_column].dropna().unique() if label != "unknown"
         )
         for label in labels:
             validation_subset = validation.loc[validation[regime_column] == label]
@@ -280,9 +265,7 @@ def _evaluate_fold(
                     "fold": fold.fold,
                     "regime_type": regime_type,
                     "regime_label": label,
-                    "validation_fraction": float(
-                        len(validation_subset) / len(validation)
-                    ),
+                    "validation_fraction": float(len(validation_subset) / len(validation)),
                     **regression,
                     **_economic_row(economics),
                 }
@@ -309,9 +292,7 @@ def _evaluate_fold(
 
     spread_rows: list[dict[str, Any]] = []
     for spread_label in sorted(
-        label
-        for label in sampled["spread_regime"].dropna().unique()
-        if label != "unknown"
+        label for label in sampled["spread_regime"].dropna().unique() if label != "unknown"
     ):
         spread_subset = sampled.loc[sampled["spread_regime"] == spread_label]
         for threshold in confidence_thresholds:
@@ -338,9 +319,7 @@ def _evaluate_fold(
             "validation_rows_after_target_filter": int(len(validation)),
             "train_time_start_seconds": float(train["time_seconds"].min()),
             "train_time_end_seconds": float(train["time_seconds"].max()),
-            "validation_time_start_seconds": float(
-                validation["time_seconds"].min()
-            ),
+            "validation_time_start_seconds": float(validation["time_seconds"].min()),
             "validation_time_end_seconds": float(validation["time_seconds"].max()),
         },
         "regime_metadata": regime_metadata,
@@ -360,9 +339,7 @@ def run_regime_analysis(
     confidence_thresholds: tuple[float, ...] = DEFAULT_CONFIDENCE_THRESHOLDS,
     cost_fractions: tuple[float, ...] = DEFAULT_COST_FRACTIONS,
 ) -> dict[str, Any]:
-    confidence_thresholds = validate_grid(
-        confidence_thresholds, "confidence_thresholds"
-    )
+    confidence_thresholds = validate_grid(confidence_thresholds, "confidence_thresholds")
     cost_fractions = validate_grid(cost_fractions, "cost_fractions")
     if any(value < 0 for value in confidence_thresholds):
         raise ValueError("Confidence thresholds cannot be negative.")
@@ -420,9 +397,7 @@ def run_regime_analysis(
     sensitivity_frame = pd.DataFrame(sensitivity_rows)
     spread_frame = pd.DataFrame(spread_rows)
 
-    regime_frame.to_csv(
-        output_directory / f"phase_b_h{horizon}_regimes.csv", index=False
-    )
+    regime_frame.to_csv(output_directory / f"phase_b_h{horizon}_regimes.csv", index=False)
     sensitivity_frame.to_csv(
         output_directory / f"phase_b_h{horizon}_threshold_cost_grid.csv",
         index=False,
@@ -495,9 +470,7 @@ def main() -> None:
         type=_parse_float_list,
         default=DEFAULT_COST_FRACTIONS,
     )
-    parser.add_argument(
-        "--output-directory", type=Path, default=Path("reports/tables")
-    )
+    parser.add_argument("--output-directory", type=Path, default=Path("reports/tables"))
     args = parser.parse_args()
 
     result = run_regime_analysis(

@@ -8,7 +8,6 @@ import pandas as pd
 from scipy.stats import chi2, kurtosis, skew, spearmanr
 from sklearn.metrics import mean_absolute_error, mean_squared_error
 
-
 SESSION_OPEN_SECONDS = 34_200.0
 
 
@@ -136,12 +135,7 @@ def descriptive_residual_metrics(
 
     nonzero = actual_array != 0.0
     nonzero_directional_accuracy = (
-        float(
-            np.mean(
-                np.sign(actual_array[nonzero])
-                == np.sign(predicted_array[nonzero])
-            )
-        )
+        float(np.mean(np.sign(actual_array[nonzero]) == np.sign(predicted_array[nonzero])))
         if nonzero.any()
         else 0.0
     )
@@ -153,9 +147,7 @@ def descriptive_residual_metrics(
         "ridge_mae_bps": ridge_mae,
         "mae_improvement_bps": float(zero_mae - ridge_mae),
         "mae_improvement_pct": (
-            float((zero_mae - ridge_mae) / zero_mae * 100.0)
-            if zero_mae > 0.0
-            else 0.0
+            float((zero_mae - ridge_mae) / zero_mae * 100.0) if zero_mae > 0.0 else 0.0
         ),
         "zero_rmse_bps": zero_rmse,
         "ridge_rmse_bps": ridge_rmse,
@@ -165,12 +157,8 @@ def descriptive_residual_metrics(
         "mean_actual_bps": float(np.mean(actual_array)),
         "mean_predicted_bps": float(np.mean(predicted_array)),
         "residual_mean_bps": float(np.mean(residual)),
-        "residual_std_bps": float(np.std(residual, ddof=1))
-        if len(residual) > 1
-        else 0.0,
-        "residual_skewness": float(skew(residual, bias=False))
-        if len(residual) > 2
-        else 0.0,
+        "residual_std_bps": float(np.std(residual, ddof=1)) if len(residual) > 1 else 0.0,
+        "residual_skewness": float(skew(residual, bias=False)) if len(residual) > 2 else 0.0,
         "residual_excess_kurtosis": float(kurtosis(residual, fisher=True, bias=False))
         if len(residual) > 3
         else 0.0,
@@ -269,9 +257,7 @@ def time_bucket_diagnostics(
 
         diagnostics = descriptive_residual_metrics(actual, predicted)
         one_event_return_bps = group["mid_log_return"].to_numpy(dtype=float) * 10_000.0
-        one_event_return_bps = one_event_return_bps[
-            np.isfinite(one_event_return_bps)
-        ]
+        one_event_return_bps = one_event_return_bps[np.isfinite(one_event_return_bps)]
 
         rows.append(
             {
@@ -282,9 +268,7 @@ def time_bucket_diagnostics(
                 **diagnostics,
                 "mean_spread_bps": float(group["spread_bps"].mean()),
                 "median_spread_bps": float(group["spread_bps"].median()),
-                "median_event_interarrival_us": float(
-                    group["event_interarrival_us"].median()
-                ),
+                "median_event_interarrival_us": float(group["event_interarrival_us"].median()),
                 "one_event_return_std_bps": (
                     float(np.std(one_event_return_bps, ddof=1))
                     if len(one_event_return_bps) > 1

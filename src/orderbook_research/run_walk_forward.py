@@ -31,7 +31,6 @@ from orderbook_research.walk_forward import (
     expanding_window_folds,
 )
 
-
 SUMMARY_METRICS = [
     "balanced_accuracy",
     "macro_f1",
@@ -119,50 +118,30 @@ def _fold_row(
         "up_recall": logistic_metrics["per_class"]["up"]["recall"],
         "zero_mae_bps": zero_metrics["mae_bps"],
         "ridge_mae_bps": ridge_metrics["mae_bps"],
-        "ridge_mae_improvement_bps": (
-            zero_metrics["mae_bps"] - ridge_metrics["mae_bps"]
-        ),
+        "ridge_mae_improvement_bps": (zero_metrics["mae_bps"] - ridge_metrics["mae_bps"]),
         "ridge_mae_improvement_pct": _percentage_improvement(
             zero_metrics["mae_bps"],
             ridge_metrics["mae_bps"],
         ),
         "zero_rmse_bps": zero_metrics["rmse_bps"],
         "ridge_rmse_bps": ridge_metrics["rmse_bps"],
-        "ridge_rmse_improvement_bps": (
-            zero_metrics["rmse_bps"] - ridge_metrics["rmse_bps"]
-        ),
+        "ridge_rmse_improvement_bps": (zero_metrics["rmse_bps"] - ridge_metrics["rmse_bps"]),
         "ridge_rmse_improvement_pct": _percentage_improvement(
             zero_metrics["rmse_bps"],
             ridge_metrics["rmse_bps"],
         ),
         "ridge_rank_ic": ridge_metrics["rank_ic"],
-        "ridge_directional_accuracy": ridge_metrics[
-            "directional_accuracy"
-        ],
-        "ridge_nonzero_directional_accuracy": ridge_metrics[
-            "nonzero_directional_accuracy"
-        ],
+        "ridge_directional_accuracy": ridge_metrics["directional_accuracy"],
+        "ridge_nonzero_directional_accuracy": ridge_metrics["nonzero_directional_accuracy"],
         "active_signals": simulation_metrics["active_signals"],
-        "active_signal_fraction": simulation_metrics[
-            "active_signal_fraction"
-        ],
+        "active_signal_fraction": simulation_metrics["active_signal_fraction"],
         "gross_return_bps": simulation_metrics["gross_return_bps"],
-        "estimated_total_cost_bps": simulation_metrics[
-            "estimated_total_cost_bps"
-        ],
+        "estimated_total_cost_bps": simulation_metrics["estimated_total_cost_bps"],
         "net_return_bps": simulation_metrics["net_return_bps"],
-        "mean_gross_return_active_bps": simulation_metrics[
-            "mean_gross_return_active_bps"
-        ],
-        "mean_estimated_cost_active_bps": simulation_metrics[
-            "mean_estimated_cost_active_bps"
-        ],
-        "mean_net_return_active_bps": simulation_metrics[
-            "mean_net_return_active_bps"
-        ],
-        "break_even_cost_fraction": simulation_metrics[
-            "break_even_cost_fraction"
-        ],
+        "mean_gross_return_active_bps": simulation_metrics["mean_gross_return_active_bps"],
+        "mean_estimated_cost_active_bps": simulation_metrics["mean_estimated_cost_active_bps"],
+        "mean_net_return_active_bps": simulation_metrics["mean_net_return_active_bps"],
+        "break_even_cost_fraction": simulation_metrics["break_even_cost_fraction"],
         "max_drawdown_bps": simulation_metrics["max_drawdown_bps"],
     }
 
@@ -229,9 +208,7 @@ def _cross_horizon_summary(output_directory: Path) -> None:
         output_directory / "walk_forward_summary.csv",
         index=False,
     )
-    (
-        output_directory / "walk_forward_summary_metrics.json"
-    ).write_text(
+    (output_directory / "walk_forward_summary_metrics.json").write_text(
         json.dumps(json_summary, indent=2, default=_json_default),
         encoding="utf-8",
     )
@@ -263,8 +240,7 @@ def _evaluate_fold(
     missing_train_classes = required_classes - set(y_train_class.unique())
     if missing_train_classes:
         raise ValueError(
-            f"Fold {fold.fold} training data is missing classes: "
-            f"{sorted(missing_train_classes)}"
+            f"Fold {fold.fold} training data is missing classes: {sorted(missing_train_classes)}"
         )
 
     majority, logistic, ridge = _build_models()
@@ -279,23 +255,13 @@ def _evaluate_fold(
 
     probabilities = logistic.predict_proba(x_validation)
     fitted_classes = logistic.named_steps["model"].classes_
-    probability_columns = {
-        int(label): position
-        for position, label in enumerate(fitted_classes)
-    }
+    probability_columns = {int(label): position for position, label in enumerate(fitted_classes)}
     for required_class in (-1, 1):
         if required_class not in probability_columns:
-            raise ValueError(
-                f"Fold {fold.fold} classifier did not fit class "
-                f"{required_class}."
-            )
+            raise ValueError(f"Fold {fold.fold} classifier did not fit class {required_class}.")
 
-    validation["probability_down"] = probabilities[
-        :, probability_columns[-1]
-    ]
-    validation["probability_up"] = probabilities[
-        :, probability_columns[1]
-    ]
+    validation["probability_down"] = probabilities[:, probability_columns[-1]]
+    validation["probability_up"] = probabilities[:, probability_columns[1]]
 
     majority_metrics = detailed_classification_metrics(
         y_validation_class,
@@ -330,12 +296,8 @@ def _evaluate_fold(
             "validation_rows_after_target_filter": int(len(validation)),
             "train_time_start_seconds": float(train["time_seconds"].min()),
             "train_time_end_seconds": float(train["time_seconds"].max()),
-            "validation_time_start_seconds": float(
-                validation["time_seconds"].min()
-            ),
-            "validation_time_end_seconds": float(
-                validation["time_seconds"].max()
-            ),
+            "validation_time_start_seconds": float(validation["time_seconds"].min()),
+            "validation_time_end_seconds": float(validation["time_seconds"].max()),
         }
     )
 
@@ -464,9 +426,7 @@ def run_walk_forward(
         output_directory / f"walk_forward_h{horizon}_folds.csv",
         index=False,
     )
-    (
-        output_directory / f"walk_forward_h{horizon}_metrics.json"
-    ).write_text(
+    (output_directory / f"walk_forward_h{horizon}_metrics.json").write_text(
         json.dumps(result, indent=2, default=_json_default),
         encoding="utf-8",
     )
@@ -477,10 +437,7 @@ def run_walk_forward(
 
 def main() -> None:
     parser = argparse.ArgumentParser(
-        description=(
-            "Run purged expanding-window validation for the current "
-            "order-book baselines."
-        )
+        description=("Run purged expanding-window validation for the current order-book baselines.")
     )
     parser.add_argument("--ticker", default="AAPL")
     parser.add_argument("--levels", type=int, default=10)

@@ -60,9 +60,7 @@ def test_reconstruction_runner_writes_outputs(
     assert (output / "phase_e_itch_AAPL_message_counts.csv").exists()
     assert (output / "phase_e_itch_AAPL_reconstruction_metrics.json").exists()
 
-    payload = json.loads(
-        (output / "phase_e_itch_AAPL_reconstruction_metrics.json").read_text()
-    )
+    payload = json.loads((output / "phase_e_itch_AAPL_reconstruction_metrics.json").read_text())
     assert payload["binary_file"]["end_marker_seen"] is True
 
 

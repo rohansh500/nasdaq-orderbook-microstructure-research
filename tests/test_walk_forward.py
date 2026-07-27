@@ -24,17 +24,16 @@ def test_each_fold_is_ordered_disjoint_and_purged():
     )
 
     for fold in folds:
-        assert np.intersect1d(
-            fold.train_indices,
-            fold.validation_indices,
-        ).size == 0
+        assert (
+            np.intersect1d(
+                fold.train_indices,
+                fold.validation_indices,
+            ).size
+            == 0
+        )
         assert fold.train_indices.max() < fold.validation_indices.min()
 
-        gap = (
-            fold.validation_indices.min()
-            - fold.train_indices.max()
-            - 1
-        )
+        gap = fold.validation_indices.min() - fold.train_indices.max() - 1
         assert gap >= 100
 
 

@@ -13,7 +13,6 @@ from orderbook_research.itch_binary import (
     timestamp_ns,
 )
 
-
 ITCH_EVENT_REPLACE = 8
 
 
@@ -72,9 +71,7 @@ class SortedPriceLevels:
             raise KeyError(f"Unknown price level: {price}")
         remaining = current - shares
         if remaining < 0:
-            raise ValueError(
-                f"Price-level underflow at {price}: {current} - {shares}."
-            )
+            raise ValueError(f"Price-level underflow at {price}: {current} - {shares}.")
         if remaining == 0:
             del self.sizes[price]
             position = bisect.bisect_left(self.prices, price)
@@ -142,9 +139,7 @@ class FullDepthOrderBook:
         if shares > order.shares:
             self.stats.share_underflows += 1
             if self.strict:
-                raise ValueError(
-                    f"Order underflow for {order_id}: {order.shares} - {shares}."
-                )
+                raise ValueError(f"Order underflow for {order_id}: {order.shares} - {shares}.")
             reduction = order.shares
 
         self._levels(order.side).remove(order.price, reduction)
@@ -204,13 +199,9 @@ class FullDepthOrderBook:
         for level in range(1, levels + 1):
             ask = asks[level - 1] if level <= len(asks) else None
             bid = bids[level - 1] if level <= len(bids) else None
-            row[f"ask_price_{level}"] = (
-                ask[0] / PRICE_SCALE if ask is not None else None
-            )
+            row[f"ask_price_{level}"] = ask[0] / PRICE_SCALE if ask is not None else None
             row[f"ask_size_{level}"] = ask[1] if ask is not None else None
-            row[f"bid_price_{level}"] = (
-                bid[0] / PRICE_SCALE if bid is not None else None
-            )
+            row[f"bid_price_{level}"] = bid[0] / PRICE_SCALE if bid is not None else None
             row[f"bid_size_{level}"] = bid[1] if bid is not None else None
         return row
 
@@ -276,10 +267,7 @@ class ItchSymbolReconstructor:
             self.target_locates.add(locate)
 
     def _record_timestamp(self, value: int) -> None:
-        if (
-            self.last_target_timestamp_ns is not None
-            and value < self.last_target_timestamp_ns
-        ):
+        if self.last_target_timestamp_ns is not None and value < self.last_target_timestamp_ns:
             self.book.stats.timestamp_monotonicity_violations += 1
         self.last_target_timestamp_ns = value
 
@@ -324,9 +312,7 @@ class ItchSymbolReconstructor:
             "price": price / PRICE_SCALE,
             "old_price": old_price / PRICE_SCALE if old_price is not None else None,
             "execution_price": (
-                execution_price / PRICE_SCALE
-                if execution_price is not None
-                else None
+                execution_price / PRICE_SCALE if execution_price is not None else None
             ),
             "direction": order.direction,
             "stock_locate": order.stock_locate,

@@ -24,7 +24,6 @@ from orderbook_research.simulation import non_overlapping_signal_simulation
 from orderbook_research.targets import add_event_horizon_targets
 from orderbook_research.walk_forward import expanding_window_folds
 
-
 METRIC_NAMES = tuple(BOOTSTRAP_BENCHMARKS)
 
 
@@ -65,19 +64,12 @@ def _fit_fold_and_bootstrap(
     ridge_prediction = ridge.predict(validation[feature_columns])
     probabilities = logistic.predict_proba(validation[feature_columns])
     fitted_classes = logistic.named_steps["model"].classes_
-    probability_columns = {
-        int(label): position
-        for position, label in enumerate(fitted_classes)
-    }
+    probability_columns = {int(label): position for position, label in enumerate(fitted_classes)}
     if -1 not in probability_columns or 1 not in probability_columns:
         raise ValueError(f"Fold {fold.fold} is missing up/down probabilities.")
 
-    validation["probability_down"] = probabilities[
-        :, probability_columns[-1]
-    ]
-    validation["probability_up"] = probabilities[
-        :, probability_columns[1]
-    ]
+    validation["probability_down"] = probabilities[:, probability_columns[-1]]
+    validation["probability_up"] = probabilities[:, probability_columns[1]]
     simulation, _ = non_overlapping_signal_simulation(
         validation,
         horizon=horizon,
@@ -110,9 +102,7 @@ def _wide_row(
         row[f"{metric}_estimate"] = summary["estimate"]
         row[f"{metric}_ci_lower"] = summary["ci_lower"]
         row[f"{metric}_ci_upper"] = summary["ci_upper"]
-        row[f"{metric}_probability_above_benchmark"] = summary[
-            "probability_above_benchmark"
-        ]
+        row[f"{metric}_probability_above_benchmark"] = summary["probability_above_benchmark"]
     return row
 
 
@@ -152,15 +142,11 @@ def run_bootstrap(
     )
 
     fold_results: list[dict[str, Any]] = []
-    fold_draws: dict[str, list[np.ndarray]] = {
-        metric: [] for metric in METRIC_NAMES
-    }
+    fold_draws: dict[str, list[np.ndarray]] = {metric: [] for metric in METRIC_NAMES}
     csv_rows: list[dict[str, Any]] = []
 
     for fold in folds:
-        print(
-            f"Horizon {horizon}: bootstrap fold {fold.fold}/{len(folds)}"
-        )
+        print(f"Horizon {horizon}: bootstrap fold {fold.fold}/{len(folds)}")
         result = _fit_fold_and_bootstrap(
             data=data,
             fold=fold,
@@ -200,18 +186,12 @@ def run_bootstrap(
 
     horizon_observed = {
         metric: float(
-            np.mean(
-                [
-                    fold_result["metrics"][metric]["estimate"]
-                    for fold_result in fold_results
-                ]
-            )
+            np.mean([fold_result["metrics"][metric]["estimate"] for fold_result in fold_results])
         )
         for metric in METRIC_NAMES
     }
     horizon_draws = {
-        metric: np.vstack(draw_list).mean(axis=0)
-        for metric, draw_list in fold_draws.items()
+        metric: np.vstack(draw_list).mean(axis=0) for metric, draw_list in fold_draws.items()
     }
     horizon_intervals = summarize_draws(
         observed=horizon_observed,
@@ -239,12 +219,8 @@ def run_bootstrap(
             "event_block_length": event_block_length,
             "confidence_level": confidence_level,
             "random_seed": random_seed,
-            "rank_ic_bootstrap": (
-                "moving blocks over fold-level rank-transformed observations"
-            ),
-            "economic_bootstrap": (
-                "moving blocks over active non-overlapping signal observations"
-            ),
+            "rank_ic_bootstrap": ("moving blocks over fold-level rank-transformed observations"),
+            "economic_bootstrap": ("moving blocks over active non-overlapping signal observations"),
             "exploratory_holdout_used": False,
         },
         "folds": fold_results,
@@ -256,9 +232,7 @@ def run_bootstrap(
         output_directory / f"bootstrap_h{horizon}_intervals.csv",
         index=False,
     )
-    (
-        output_directory / f"bootstrap_h{horizon}_metrics.json"
-    ).write_text(
+    (output_directory / f"bootstrap_h{horizon}_metrics.json").write_text(
         json.dumps(payload, indent=2, default=_json_default),
         encoding="utf-8",
     )
@@ -303,9 +277,7 @@ def _cross_horizon_summary(output_directory: Path) -> None:
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(
-        description="Moving-block bootstrap for walk-forward metrics."
-    )
+    parser = argparse.ArgumentParser(description="Moving-block bootstrap for walk-forward metrics.")
     parser.add_argument("--ticker", default="AAPL")
     parser.add_argument("--levels", type=int, default=10)
     parser.add_argument("--horizon", type=int, choices=[10, 50, 100], required=True)

@@ -82,9 +82,7 @@ def expanding_window_folds(
     folds: list[ExpandingWindowFold] = []
 
     for fold_number in range(1, n_folds + 1):
-        validation_start = (
-            first_validation_start + (fold_number - 1) * validation_size
-        )
+        validation_start = first_validation_start + (fold_number - 1) * validation_size
         validation_end = min(
             validation_start + validation_size,
             development_end,
@@ -92,13 +90,9 @@ def expanding_window_folds(
         train_end_exclusive = validation_start - purge_events
 
         if train_end_exclusive <= 0:
-            raise ValueError(
-                f"Fold {fold_number} has no training rows after purging."
-            )
+            raise ValueError(f"Fold {fold_number} has no training rows after purging.")
         if validation_end <= validation_start:
-            raise ValueError(
-                f"Fold {fold_number} has an empty validation block."
-            )
+            raise ValueError(f"Fold {fold_number} has an empty validation block.")
 
         train_indices = np.arange(0, train_end_exclusive, dtype=np.int64)
         validation_indices = np.arange(
@@ -107,15 +101,10 @@ def expanding_window_folds(
             dtype=np.int64,
         )
 
-        gap = (
-            int(validation_indices.min())
-            - int(train_indices.max())
-            - 1
-        )
+        gap = int(validation_indices.min()) - int(train_indices.max()) - 1
         if gap < purge_events:
             raise AssertionError(
-                f"Fold {fold_number} purge gap is {gap}, expected at least "
-                f"{purge_events}."
+                f"Fold {fold_number} purge gap is {gap}, expected at least {purge_events}."
             )
 
         folds.append(
@@ -128,20 +117,13 @@ def expanding_window_folds(
             )
         )
 
-    for previous, current in zip(folds, folds[1:]):
+    for previous, current in zip(folds, folds[1:], strict=False):
         if len(current.train_indices) <= len(previous.train_indices):
             raise AssertionError("Training windows must expand by fold.")
-        if (
-            current.validation_indices.min()
-            <= previous.validation_indices.min()
-        ):
-            raise AssertionError(
-                "Validation windows must move forward chronologically."
-            )
+        if current.validation_indices.min() <= previous.validation_indices.min():
+            raise AssertionError("Validation windows must move forward chronologically.")
 
     if folds[-1].validation_indices[-1] >= development_end:
-        raise AssertionError(
-            "The final validation block must remain inside development data."
-        )
+        raise AssertionError("The final validation block must remain inside development data.")
 
     return folds

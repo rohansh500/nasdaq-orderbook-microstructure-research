@@ -2,12 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from math import floor
-from typing import Any
 
 import numpy as np
 import pandas as pd
 from scipy.stats import rankdata, spearmanr
-
 
 BOOTSTRAP_BENCHMARKS: dict[str, float] = {
     "ridge_rank_ic": 0.0,
@@ -45,9 +43,7 @@ def _overlapping_block_sums(
     if block_length < 1:
         raise ValueError("block_length must be at least one.")
     if len(array) < block_length:
-        raise ValueError(
-            "The sample must contain at least one complete bootstrap block."
-        )
+        raise ValueError("The sample must contain at least one complete bootstrap block.")
 
     cumulative = np.concatenate(([0.0], np.cumsum(array, dtype=float)))
     return cumulative[block_length:] - cumulative[:-block_length]
@@ -78,10 +74,7 @@ def _draw_block_totals(
         size=(n_bootstrap, n_blocks),
     )
 
-    return {
-        name: values[sampled_starts].sum(axis=1)
-        for name, values in block_sums.items()
-    }
+    return {name: values[sampled_starts].sum(axis=1) for name, values in block_sums.items()}
 
 
 def _safe_correlation_from_totals(
@@ -156,9 +149,7 @@ def _event_bootstrap_draws(
     zero_error = np.abs(actual)
     ridge_error = np.abs(actual - predicted)
     nonzero = actual != 0.0
-    direction_correct = (
-        nonzero & (np.sign(actual) == np.sign(predicted))
-    ).astype(float)
+    direction_correct = (nonzero & (np.sign(actual) == np.sign(predicted))).astype(float)
 
     block_sums = {
         "rank_x": _overlapping_block_sums(actual_rank, block_length),
@@ -198,12 +189,15 @@ def _event_bootstrap_draws(
     zero_mae_draws = totals["zero_error"] / rows_used
     ridge_mae_draws = totals["ridge_error"] / rows_used
     mae_improvement_draws = zero_mae_draws - ridge_mae_draws
-    mae_improvement_pct_draws = np.divide(
-        mae_improvement_draws,
-        zero_mae_draws,
-        out=np.zeros_like(mae_improvement_draws),
-        where=zero_mae_draws > 0,
-    ) * 100.0
+    mae_improvement_pct_draws = (
+        np.divide(
+            mae_improvement_draws,
+            zero_mae_draws,
+            out=np.zeros_like(mae_improvement_draws),
+            where=zero_mae_draws > 0,
+        )
+        * 100.0
+    )
     nonzero_direction_draws = np.divide(
         totals["direction_correct"],
         totals["nonzero"],
@@ -222,14 +216,10 @@ def _event_bootstrap_draws(
         "ridge_rank_ic": exact_rank_ic,
         "ridge_mae_improvement_bps": float(mae_improvement),
         "ridge_mae_improvement_pct": (
-            float(mae_improvement / zero_mae * 100.0)
-            if zero_mae > 0
-            else 0.0
+            float(mae_improvement / zero_mae * 100.0) if zero_mae > 0 else 0.0
         ),
         "ridge_nonzero_directional_accuracy": (
-            float(direction_correct.sum() / nonzero_count)
-            if nonzero_count > 0
-            else 0.0
+            float(direction_correct.sum() / nonzero_count) if nonzero_count > 0 else 0.0
         ),
     }
     draws = {
@@ -301,9 +291,7 @@ def _simulation_bootstrap_draws(
         "mean_gross_return_active_bps": float(gross.mean()),
         "mean_estimated_cost_active_bps": float(cost.mean()),
         "mean_net_return_active_bps": float(net.mean()),
-        "break_even_cost_fraction": (
-            float(gross.sum() / cost.sum()) if cost.sum() > 0 else 0.0
-        ),
+        "break_even_cost_fraction": (float(gross.sum() / cost.sum()) if cost.sum() > 0 else 0.0),
     }
     draws = {
         "mean_gross_return_active_bps": mean_gross_draws,
@@ -362,13 +350,11 @@ def bootstrap_fold_metrics(
     if active_rows < simulation_block_length:
         simulation_block_length = max(1, active_rows)
 
-    simulation_observed, simulation_draws, simulation_rows_used = (
-        _simulation_bootstrap_draws(
-            simulation=simulation,
-            block_length=simulation_block_length,
-            n_bootstrap=n_bootstrap,
-            rng=rng,
-        )
+    simulation_observed, simulation_draws, simulation_rows_used = _simulation_bootstrap_draws(
+        simulation=simulation,
+        block_length=simulation_block_length,
+        n_bootstrap=n_bootstrap,
+        rng=rng,
     )
 
     observed = {**event_observed, **simulation_observed}

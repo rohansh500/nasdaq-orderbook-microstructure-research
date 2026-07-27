@@ -9,7 +9,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from lightgbm import LGBMClassifier, LGBMRegressor
@@ -27,9 +27,7 @@ from orderbook_research.model_comparison import (
     probability_positions,
 )
 
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt  # noqa: E402
-
+plt.switch_backend("Agg")
 
 SCHEMA_VERSION = "0.8.0"
 PRIMARY_HORIZON = 50
@@ -55,9 +53,7 @@ class FinalHoldoutSplit:
             "development_end": int(self.development_indices.max()),
             "holdout_start": int(self.holdout_indices.min()),
             "holdout_end": int(self.holdout_indices.max()),
-            "development_rows_before_target_filter": int(
-                len(self.development_indices)
-            ),
+            "development_rows_before_target_filter": int(len(self.development_indices)),
             "holdout_rows_before_target_filter": int(len(self.holdout_indices)),
         }
 
@@ -94,9 +90,7 @@ def final_holdout_split(
 
     if split.development_indices.max() >= split.holdout_indices.min():
         raise AssertionError("Development and holdout blocks overlap.")
-    actual_gap = (
-        split.holdout_indices.min() - split.development_indices.max() - 1
-    )
+    actual_gap = split.holdout_indices.min() - split.development_indices.max() - 1
     if actual_gap < effective_purge:
         raise AssertionError("The development-to-holdout purge is too small.")
     return split
@@ -165,9 +159,7 @@ def normalized_importance_frame(
     feature_columns: list[str],
     model_name: str,
 ) -> pd.DataFrame:
-    values = normalized_feature_importance(
-        feature_columns, model.feature_importances_
-    )
+    values = normalized_feature_importance(feature_columns, model.feature_importances_)
     return pd.DataFrame(
         [
             {
@@ -201,9 +193,7 @@ def validate_run_request(
             raise ValueError("Smoke mode requires --max-rows.")
         return
     if not confirm_final_holdout:
-        raise ValueError(
-            "Final evaluation requires --confirm-final-holdout."
-        )
+        raise ValueError("Final evaluation requires --confirm-final-holdout.")
     if max_rows is not None:
         raise ValueError("The final evaluation cannot use --max-rows.")
 
@@ -280,10 +270,7 @@ def generate_final_figures(
     generated: list[str] = []
 
     labels = ["Down", "Flat", "Up"]
-    proportions = [
-        class_distribution["proportions"][name]
-        for name in ("down", "flat", "up")
-    ]
+    proportions = [class_distribution["proportions"][name] for name in ("down", "flat", "up")]
     plt.figure(figsize=(7, 4.5))
     plt.bar(labels, proportions)
     plt.ylabel("Holdout proportion")
@@ -349,11 +336,13 @@ def generate_final_figures(
     _save_figure(path)
     generated.append(path.name)
 
-    edge_frame = economics_rows.set_index("model")[[
-        "mean_gross_return_active_bps",
-        "mean_estimated_cost_active_bps",
-        "mean_net_return_active_bps",
-    ]]
+    edge_frame = economics_rows.set_index("model")[
+        [
+            "mean_gross_return_active_bps",
+            "mean_estimated_cost_active_bps",
+            "mean_net_return_active_bps",
+        ]
+    ]
     plt.figure(figsize=(9, 5))
     edge_frame.plot(kind="bar", ax=plt.gca())
     plt.axhline(0.0, linewidth=1)
@@ -432,29 +421,27 @@ def write_research_note(
     zero = regression["zero_return"]
     lightgbm_econ = economics["lightgbm_classifier"]
 
-    mae_improvement = percentage_improvement(
-        float(zero["mae_bps"]), float(lightgbm_reg["mae_bps"])
-    )
+    mae_improvement = percentage_improvement(float(zero["mae_bps"]), float(lightgbm_reg["mae_bps"]))
 
     note = f"""# Final frozen-candidate evaluation
 
 ## Research question
 
 Can event-level order-book state and order-flow features predict AAPL mid-price
-movement over the next {configuration['horizon_events']} events, and is the
+movement over the next {configuration["horizon_events"]} events, and is the
 result large enough to survive an aggressive quoted-spread cost assumption?
 
 ## Frozen protocol
 
-- Instrument: {configuration['ticker']}
-- Book depth: {configuration['levels']} levels
-- Horizon: {configuration['horizon_events']} events
-- Development fraction: {configuration['development_fraction']:.0%}
-- Development-to-holdout purge: {configuration['effective_purge_events']} events
+- Instrument: {configuration["ticker"]}
+- Book depth: {configuration["levels"]} levels
+- Horizon: {configuration["horizon_events"]} events
+- Development fraction: {configuration["development_fraction"]:.0%}
+- Development-to-holdout purge: {configuration["effective_purge_events"]} events
 - Selected classifier/regressor: fixed-parameter LightGBM
 - Selected feature set: all default features except explicit clock-time features
-- Selected feature count: {configuration['feature_count']}
-- Confidence threshold: {configuration['confidence_threshold']:.2f}
+- Selected feature count: {configuration["feature_count"]}
+- Confidence threshold: {configuration["confidence_threshold"]:.2f}
 - Cost assumption: full estimated quoted-spread crossing cost
 
 The candidate and evaluation rules were frozen before this run. The final block
@@ -467,30 +454,30 @@ data set. Truly independent evidence requires additional trading days.
 
 The frozen LightGBM classifier achieved:
 
-- Accuracy: {lightgbm_class['accuracy']:.2%}
-- Balanced accuracy: {lightgbm_class['balanced_accuracy']:.2%}
-- Macro F1: {lightgbm_class['macro_f1']:.3f}
+- Accuracy: {lightgbm_class["accuracy"]:.2%}
+- Balanced accuracy: {lightgbm_class["balanced_accuracy"]:.2%}
+- Macro F1: {lightgbm_class["macro_f1"]:.3f}
 
 ## Final return-prediction result
 
 The frozen LightGBM regressor achieved:
 
-- MAE: {lightgbm_reg['mae_bps']:.3f} bps
-- Zero-return MAE: {zero['mae_bps']:.3f} bps
+- MAE: {lightgbm_reg["mae_bps"]:.3f} bps
+- Zero-return MAE: {zero["mae_bps"]:.3f} bps
 - MAE improvement versus zero: {mae_improvement:+.2f}%
-- Rank IC: {lightgbm_reg['rank_ic']:.3f}
-- Non-zero directional accuracy: {lightgbm_reg['nonzero_directional_accuracy']:.2%}
+- Rank IC: {lightgbm_reg["rank_ic"]:.3f}
+- Non-zero directional accuracy: {lightgbm_reg["nonzero_directional_accuracy"]:.2%}
 
 ## Final execution result
 
 At the frozen 0.10 confidence threshold:
 
-- Active-signal fraction: {lightgbm_econ['active_signal_fraction']:.2%}
-- Gross edge per active signal: {lightgbm_econ['mean_gross_return_active_bps']:.3f} bps
-- Estimated cost per active signal: {lightgbm_econ['mean_estimated_cost_active_bps']:.3f} bps
-- Net edge per active signal: {lightgbm_econ['mean_net_return_active_bps']:.3f} bps
-- Break-even cost fraction: {lightgbm_econ['break_even_cost_fraction']:.2%}
-- Maximum drawdown: {lightgbm_econ['max_drawdown_bps']:.1f} bps
+- Active-signal fraction: {lightgbm_econ["active_signal_fraction"]:.2%}
+- Gross edge per active signal: {lightgbm_econ["mean_gross_return_active_bps"]:.3f} bps
+- Estimated cost per active signal: {lightgbm_econ["mean_estimated_cost_active_bps"]:.3f} bps
+- Net edge per active signal: {lightgbm_econ["mean_net_return_active_bps"]:.3f} bps
+- Break-even cost fraction: {lightgbm_econ["break_even_cost_fraction"]:.2%}
+- Maximum drawdown: {lightgbm_econ["max_drawdown_bps"]:.1f} bps
 
 ## Interpretation
 
@@ -503,7 +490,9 @@ fees and model decay.
 ## Limitations
 
 1. One stock and one trading day cannot establish out-of-day generalisation.
-2. The predictive experiment uses one LOBSTER stock-day. The repository contains a separate independent raw ITCH reconstruction path, but that 2019 reconstruction was not used as an out-of-day evaluation of the frozen prediction model.
+2. The predictive experiment uses one LOBSTER stock-day. The repository contains a
+   separate independent raw ITCH reconstruction path, but that 2019 reconstruction
+   was not used as an out-of-day evaluation of the frozen prediction model.
 3. The execution model assumes immediate aggressive fills and does not model
    queue position, partial fills, latency or adverse selection.
 4. The final block was previously viewed for exploratory linear baselines,

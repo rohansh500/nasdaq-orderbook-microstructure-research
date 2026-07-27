@@ -26,16 +26,12 @@ def purged_chronological_split(
     if not 0 < validation_fraction < 1:
         raise ValueError("validation_fraction must be between zero and one.")
     if train_fraction + validation_fraction >= 1:
-        raise ValueError(
-            "train_fraction + validation_fraction must be below one."
-        )
+        raise ValueError("train_fraction + validation_fraction must be below one.")
     if purge_events < 0:
         raise ValueError("purge_events cannot be negative.")
 
     train_boundary = int(n_rows * train_fraction)
-    validation_boundary = int(
-        n_rows * (train_fraction + validation_fraction)
-    )
+    validation_boundary = int(n_rows * (train_fraction + validation_fraction))
 
     train_end = train_boundary - purge_events
     validation_end = validation_boundary - purge_events
@@ -53,13 +49,7 @@ def purged_chronological_split(
 
     assert split.train_indices.max() < split.validation_indices.min()
     assert split.validation_indices.max() < split.test_indices.min()
-    assert (
-        split.validation_indices.min() - split.train_indices.max() - 1
-        >= purge_events
-    )
-    assert (
-        split.test_indices.min() - split.validation_indices.max() - 1
-        >= purge_events
-    )
+    assert split.validation_indices.min() - split.train_indices.max() - 1 >= purge_events
+    assert split.test_indices.min() - split.validation_indices.max() - 1 >= purge_events
 
     return split
