@@ -118,9 +118,7 @@ def _tree_value(node: dict[str, Any], row: np.ndarray) -> float:
     while "v" not in current:
         value = float(row[int(current["f"])])
         missing_type = str(current.get("m", "None"))
-        is_missing = np.isnan(value) or (
-            missing_type == "Zero" and value == 0.0
-        )
+        is_missing = np.isnan(value) or (missing_type == "Zero" and value == 0.0)
         if is_missing:
             go_left = bool(current["d"])
         else:
@@ -186,8 +184,7 @@ def export_models(
 ) -> dict[str, Any]:
     if not classifier_path.exists() or not regressor_path.exists():
         raise FileNotFoundError(
-            "Frozen joblib models were not found. Re-run Phase D locally or "
-            "pass explicit paths."
+            "Frozen joblib models were not found. Re-run Phase D locally or pass explicit paths."
         )
 
     final_manifest = json.loads(final_manifest_path.read_text(encoding="utf-8"))
@@ -195,9 +192,7 @@ def export_models(
     expected_features = [str(value) for value in configuration["feature_columns"]]
     selected = selected_feature_columns(levels=levels)
     if expected_features != selected:
-        raise ValueError(
-            "Repository feature order differs from final_evaluation_manifest.json."
-        )
+        raise ValueError("Repository feature order differs from final_evaluation_manifest.json.")
 
     classifier = joblib.load(classifier_path)
     regressor = joblib.load(regressor_path)
@@ -303,14 +298,8 @@ def export_models(
     manifest_output = output_directory / "feature_manifest.json"
     manifest_output.write_text(json.dumps(payload, indent=2), encoding="utf-8")
 
-    print(
-        f"Classifier JSON: {classifier_output} "
-        f"({classifier_output.stat().st_size:,} bytes)"
-    )
-    print(
-        f"Regressor JSON: {regressor_output} "
-        f"({regressor_output.stat().st_size:,} bytes)"
-    )
+    print(f"Classifier JSON: {classifier_output} ({classifier_output.stat().st_size:,} bytes)")
+    print(f"Regressor JSON: {regressor_output} ({regressor_output.stat().st_size:,} bytes)")
     print(f"Manifest: {manifest_output}")
     print(
         "Parity max absolute differences:",

@@ -19,13 +19,9 @@ def _sha256(path: Path) -> str:
 
 def main() -> None:
     final_manifest = json.loads(
-        (ROOT / "reports" / "tables" / "final_evaluation_manifest.json").read_text(
-            encoding="utf-8"
-        )
+        (ROOT / "reports" / "tables" / "final_evaluation_manifest.json").read_text(encoding="utf-8")
     )
-    web_manifest = json.loads(
-        (MODELS / "feature_manifest.json").read_text(encoding="utf-8")
-    )
+    web_manifest = json.loads((MODELS / "feature_manifest.json").read_text(encoding="utf-8"))
     expected = final_manifest["configuration"]["feature_columns"]
     if web_manifest["featureNames"] != expected:
         raise SystemExit("Web feature order differs from the frozen manifest.")
@@ -39,9 +35,7 @@ def main() -> None:
         "engineering.json",
         "synthetic-replay.json",
     }
-    missing_data = sorted(
-        name for name in required_data if not (WEB / "data" / name).exists()
-    )
+    missing_data = sorted(name for name in required_data if not (WEB / "data" / name).exists())
     if missing_data:
         raise SystemExit(f"Missing generated website data: {missing_data}")
 
