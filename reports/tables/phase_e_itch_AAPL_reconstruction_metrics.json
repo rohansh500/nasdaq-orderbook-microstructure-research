@@ -1,0 +1,94 @@
+{
+  "configuration": {
+    "result_schema_version": "0.9.0",
+    "input_path": "data\\raw\\itch\\01302019.NASDAQ_ITCH50.gz",
+    "input_filename": "01302019.NASDAQ_ITCH50.gz",
+    "symbol": "AAPL",
+    "levels": 10,
+    "strict": true,
+    "max_messages": null,
+    "stop_after_target_events": null,
+    "batch_size": 50000,
+    "sample_rows": 10000,
+    "price_precision": 4,
+    "replace_event_type": 8
+  },
+  "binary_file": {
+    "records_read": 368366634,
+    "payload_bytes_read": 10509149824,
+    "end_marker_seen": false,
+    "stopped_early": false,
+    "length_mismatches": 0,
+    "input_size_bytes": 4764426091,
+    "end_marker_required_only_for_complete_session": true,
+    "stop_reason": null
+  },
+  "symbol": "AAPL",
+  "levels": 10,
+  "target_locates": [
+    14
+  ],
+  "message_counts": {
+    "A": 162970455,
+    "B": 116,
+    "C": 158886,
+    "D": 158273361,
+    "E": 8096995,
+    "F": 1725898,
+    "H": 8805,
+    "I": 3684511,
+    "J": 62,
+    "L": 193769,
+    "P": 1326184,
+    "Q": 17430,
+    "R": 8714,
+    "S": 6,
+    "U": 27222746,
+    "V": 1,
+    "X": 4669874,
+    "Y": 8821
+  },
+  "reconstruction": {
+    "target_book_events": 1656597,
+    "target_non_book_trades": 11703,
+    "adds": 752975,
+    "executions": 89735,
+    "cancels": 5900,
+    "deletes": 685024,
+    "replaces": 122963,
+    "duplicate_order_references": 0,
+    "missing_target_order_references": 0,
+    "share_underflows": 0,
+    "timestamp_monotonicity_violations": 0,
+    "crossed_book_rows": 0,
+    "locked_book_rows": 0,
+    "max_open_orders": 42774,
+    "final_open_orders": 0
+  },
+  "final_integrity": {
+    "order_count": 0,
+    "bid_level_count": 0,
+    "ask_level_count": 0,
+    "bid_aggregate_matches_orders": true,
+    "ask_aggregate_matches_orders": true,
+    "bid_price_index_sorted": true,
+    "ask_price_index_sorted": true,
+    "nonpositive_orders": 0,
+    "valid": true
+  },
+  "benchmark": {
+    "elapsed_seconds": 9102.219439000008,
+    "records_per_second": 40469.97948892228,
+    "target_book_events_per_second": 181.99923777952753,
+    "compressed_input_megabytes_per_second": 0.5234356436833424,
+    "peak_tracemalloc_megabytes": 303.59331
+  },
+  "outputs": {
+    "parquet_path": "reports\\tables\\phase_e_itch_AAPL_events.parquet",
+    "parquet_rows": 1656597,
+    "parquet_size_bytes": 64631554,
+    "sample_csv_path": "reports\\tables\\phase_e_itch_AAPL_events_sample.csv",
+    "feature_sample_csv_path": "reports\\tables\\phase_e_itch_AAPL_features_sample.csv",
+    "message_counts_csv_path": "reports\\tables\\phase_e_itch_AAPL_message_counts.csv"
+  }
+}

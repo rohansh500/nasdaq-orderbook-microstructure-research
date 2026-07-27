@@ -503,19 +503,25 @@ fees and model decay.
 ## Limitations
 
 1. One stock and one trading day cannot establish out-of-day generalisation.
-2. LOBSTER provides reconstructed displayed-book snapshots rather than an
-   independently parsed raw ITCH feed.
+2. The predictive experiment uses one LOBSTER stock-day. The repository contains a separate independent raw ITCH reconstruction path, but that 2019 reconstruction was not used as an out-of-day evaluation of the frozen prediction model.
 3. The execution model assumes immediate aggressive fills and does not model
    queue position, partial fills, latency or adverse selection.
 4. The final block was previously viewed for exploratory linear baselines,
    although not for the frozen LightGBM no-time configuration.
 5. Feature importance is descriptive and is not a causal attribution.
 
-## Next research step
+## Raw ITCH engineering extension
 
-Phase E should add raw NASDAQ ITCH parsing and, when accessible, multiple days
-or instruments. That extension is required for a truly untouched temporal test
-and for independent order-book reconstruction benchmarks.
+A separate streaming parser reconstructed 1,656,597 AAPL displayed-book
+transitions from 368,366,634 market-wide Nasdaq ITCH messages. All tracked
+order-reference, quantity, timestamp, aggregation, and crossed-book invariant
+checks passed.
+
+## Potential extensions
+
+Further research could evaluate additional dates and instruments, probability
+calibration, passive execution assumptions, queue position, latency, partial
+fills, and market impact.
 """
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(note, encoding="utf-8")
